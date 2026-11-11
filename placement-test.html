@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>German Placement Test</title>
+<style>
+  :root {
+    --bg: #f7f7f5; --card: #ffffff; --text: #1d2430; --muted: #5d6675; --line: #dfe3e8;
+    --accent: #1f4e8c; --accent-soft: #e6eef8; --good: #1e7a46; --good-soft: #e3f3ea;
+    --mid: #9a6700; --mid-soft: #fbf0d9; --bad: #b42318; --bad-soft: #fbe6e4;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14171c; --card: #1d2128; --text: #e7eaee; --muted: #a2abb8; --line: #333a45;
+      --accent: #8db4ec; --accent-soft: #23324a; --good: #6fcf97; --good-soft: #1d3428;
+      --mid: #e8b94f; --mid-soft: #3a3020; --bad: #f28b82; --bad-soft: #3d2423;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 1.6rem; margin: 0 0 4px; }
+  h2 { font-size: 1.2rem; margin: 28px 0 8px; }
+  p, li { color: var(--text); }
+  .muted { color: var(--muted); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; margin: 16px 0; }
+  button { font: inherit; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--text); padding: 10px 16px; cursor: pointer; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--card); font-weight: 600; }
+  button:disabled { opacity: .5; cursor: default; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .progress { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; margin: 8px 0 16px; }
+  .progress > div { height: 100%; background: var(--accent); width: 0; transition: width .2s; }
+  .question { font-size: 1.15rem; margin: 8px 0 16px; }
+  .options { display: grid; gap: 8px; }
+  .options button { text-align: left; padding: 12px 14px; }
+  .options button:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .options button .key { display: inline-block; min-width: 1.6em; color: var(--muted); }
+  .options button.dunno { color: var(--muted); font-style: italic; }
+  table { width: 100%; border-collapse: collapse; font-size: .95rem; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; }
+  .tag { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: .85rem; white-space: nowrap; }
+  .t-good { background: var(--good-soft); color: var(--good); }
+  .t-mid { background: var(--mid-soft); color: var(--mid); }
+  .t-bad { background: var(--bad-soft); color: var(--bad); }
+  .big { font-size: 1.3rem; font-weight: 700; }
+  textarea { width: 100%; min-height: 260px; font: inherit; padding: 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--text); }
+  input[type=number], select { font: inherit; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--line); background: var(--card); color: var(--text); width: 7em; }
+  label { display: block; margin: 8px 0 4px; font-weight: 600; }
+  details { margin: 8px 0; }
+  summary { cursor: pointer; color: var(--accent); }
+  .wrong { color: var(--bad); }
+  .right { color: var(--good); }
+  .hidden { display: none; }
+  .note { font-size: .9rem; color: var(--muted); }
+  .scroll { overflow-x: auto; }
+  @media print { button, .noprint { display: none !important; } body { background: #fff; } .card { border: none; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>German Placement Test</h1>
+  <p class="muted">B1 to C2 · grammar diagnostic for the C2 (GDS) study plan · works offline, nothing is sent anywhere</p>
+
+  <!-- INTRO -->
+  <section id="intro" class="card">
+    <h2 style="margin-top:0">How it works</h2>
+    <ol>
+      <li><b>Part 1, grammar (35–45 min, here):</b> 72 questions, 3 for each grammar unit of the curriculum, from B2 up to C2. Answer without looking anything up.</li>
+      <li><b>Part 2, reading and listening (about 2 hours, separately):</b> the Lesen (65 min, pages 7–15) and Hören (about 40 min, pages 17–21, with the MP3s from goethe.de) modules of <i>c1-modular_modellsatz.pdf</i>. Don't look past page 28 until you're done: the answer keys and the transcripts come after it. Score them with the answer key and enter your percentages on the results page. Don't use the C2 practice set; save it for your first full mock exam.</li>
+      <li><b>Part 3, writing (45 min, here):</b> one short argumentative text, rated with the rubric prompt this page gives you.</li>
+    </ol>
+    <p><b>Choose "Ich weiß es nicht" whenever you would be guessing.</b> A lucky guess puts you on a faster track than you're ready for. If the questions get too hard, the test offers you a way to stop early.</p>
+    <p class="note">Your answers are saved in this browser, so you can close the page and come back later.</p>
+    <div class="row">
+      <button class="primary" id="startBtn">Start Part 1</button>
+      <button id="resumeBtn" class="hidden">Resume</button>
+      <button id="resultsBtn" class="hidden">Go to results</button>
+      <button id="resetBtn" class="hidden">Start over</button>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz" class="card hidden">
+    <div class="row" style="justify-content:space-between">
+      <span id="qMeta" class="muted"></span>
+      <span id="qCount" class="muted"></span>
+    </div>
+    <div class="progress"><div id="bar"></div></div>
+    <div id="qText" class="question"></div>
+    <div id="qOptions" class="options"></div>
+    <p class="note">Keyboard: 1–4 to answer, 5 for "Ich weiß es nicht".</p>
+  </section>
+
+  <!-- EARLY STOP -->
+  <section id="stopOffer" class="card hidden">
+    <h2 style="margin-top:0">Time for a check</h2>
+    <p id="stopText"></p>
+    <div class="row">
+      <button class="primary" id="stopBtn">Stop and see results</button>
+      <button id="continueBtn">Continue anyway</button>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section id="results" class="hidden">
+    <div class="card">
+      <h2 style="margin-top:0">Part 1 result: grammar</h2>
+      <div id="bandSummary"></div>
+      <p id="grammarTrack" class="big"></p>
+      <p id="grammarTrackText"></p>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0">Your units</h2>
+      <p class="note">3/3 means you only need review cards for that unit. 2/3 means a short version (1–2 days). 0–1/3 means the full unit.</p>
+      <div class="scroll"><table id="unitTable"></table></div>
+      <details>
+        <summary>Show the questions you missed, with explanations</summary>
+        <div id="missed"></div>
+      </details>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0">Part 2: reading and listening (Goethe C1 Modellsatz)</h2>
+      <p class="note">Score the Lesen and Hören modules with the answer keys on pages 31 and 33. Each module has 30 questions, so your percentage is correct answers ÷ 30 × 100 (for example, 21 correct = 70%).</p>
+      <div class="row">
+        <div><label for="lesen">Lesen %</label><input type="number" id="lesen" min="0" max="100"></div>
+        <div><label for="hoeren">Hören %</label><input type="number" id="hoeren" min="0" max="100"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0">Part 3: writing (45 minutes)</h2>
+      <p><b>Aufgabe:</b> Immer mehr Unternehmen erlauben dauerhaftes Arbeiten im Homeoffice. Schreiben Sie einen argumentativen Text (ca. 250 Wörter): Welche Vor- und Nachteile hat das für Beschäftigte und für die Gesellschaft? Nehmen Sie begründet Stellung.</p>
+      <div class="row noprint">
+        <button id="timerBtn">Start 45-minute timer</button>
+        <span id="timer" class="muted"></span>
+        <span id="wordCount" class="muted"></span>
+      </div>
+      <textarea id="essay" placeholder="Schreiben Sie hier ... (no spell-checker, no dictionary)" spellcheck="false"></textarea>
+      <p class="note">When you finish, copy the assessment prompt, paste it into a new Claude chat (this uses your normal Claude plan, not the API), then enter the overall level Claude gives you.</p>
+      <div class="row">
+        <button id="copyBtn">Copy assessment prompt</button>
+        <span id="copyMsg" class="muted"></span>
+      </div>
+      <label for="writing">Overall writing level from the assessment</label>
+      <select id="writing">
+        <option value="">— not yet —</option>
+        <option>B1</option><option>B2</option><option>C1</option><option>C2</option>
+      </select>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0">Your starting track</h2>
+      <div id="finalTrack"></div>
+      <div class="row noprint" style="margin-top:12px">
+        <button id="exportBtn">Download results (JSON)</button>
+        <button id="printBtn">Print or save as PDF</button>
+        <button id="restartBtn">Start over</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+"use strict";
+
+const UNITS = {
+  1: "Word order: verb position, sentence bracket, middle field",
+  2: "Declension: articles, adjective endings, n-declension",
+  3: "Prepositions; verbs with fixed prepositions; da-/wo-",
+  4: "Konjunktiv II",
+  5: "Passive",
+  6: "Relative clauses",
+  7: "Infinitive clauses",
+  8: "Connectors",
+  9: "Nominalisation",
+  10: "Verbalisation; nouns with fixed prepositions",
+  11: "Funktionsverbgefüge",
+  12: "Participle attributes; gerundive",
+  14: "Konjunktiv I and reported speech",
+  15: "Alternatives to the passive",
+  16: "Modal verbs of assumption and hearsay",
+  17: "Modal particles",
+  18: "Advanced connectors",
+  19: "Word order for emphasis; negation",
+  20: "Genitive verbs and adjectives",
+  21: "Word formation",
+  22: "Register",
+  23: "Collocations and idioms",
+  24: "Shades of meaning",
+  25: "Cohesion and reference"
+};
+
+const BANDS = [
+  { id: "b2", name: "B2 consolidation (units 1–8)", units: [1, 2, 3, 4, 5, 6, 7, 8] },
+  { id: "c1", name: "C1 (units 9–17)", units: [9, 10, 11, 12, 14, 15, 16, 17] },
+  { id: "c2", name: "C1+/C2 (units 18–25)", units: [18, 19, 20, 21, 22, 23, 24, 25] }
+];
+
+// First option is always the correct one; options are shuffled when shown.
+const ITEMS = [
+  // Unit 1
+  { u: 1, q: "Which sentence is correct?", o: ["Gestern hat er den Zug nur mit Mühe erreicht.", "Gestern er hat den Zug nur mit Mühe erreicht.", "Er gestern hat den Zug nur mit Mühe erreicht.", "Gestern hat er den Zug erreicht nur mit Mühe."], e: "Main clause: the finite verb is in position 2, the participle closes the sentence bracket." },
+  { u: 1, q: "Ich weiß nicht, ob er gestern ___.", o: ["kommen konnte", "konnte kommen", "kommen gekonnt", "gekonnt kommen"], e: "In a subordinate clause the finite verb goes last: kommen konnte." },
+  { u: 1, q: "Which order sounds most natural?", o: ["Sie fährt morgen wegen der Prüfung mit dem Zug nach Berlin.", "Sie fährt nach Berlin morgen mit dem Zug wegen der Prüfung.", "Sie fährt mit dem Zug nach Berlin wegen der Prüfung morgen.", "Sie fährt wegen der Prüfung nach Berlin morgen mit dem Zug."], e: "Neutral middle-field order: time – cause – manner – place (TeKaMoLo)." },
+  // Unit 2
+  { u: 2, q: "Das war die Rede ___ Juristen.", o: ["eines bekannten", "einem bekannten", "eines bekannter", "ein bekannter"], e: "Genitive masculine: eines bekannten Juristen (n-declension noun)." },
+  { u: 2, q: "Bei ___ Wetter bleiben wir zu Hause.", o: ["schlechtem", "schlechten", "schlechter", "schlechtes"], e: "No article, dative neuter: the adjective takes the strong ending -em." },
+  { u: 2, q: "Wir haben ___ um Rat gebeten.", o: ["den Präsidenten", "den Präsident", "dem Präsidenten", "der Präsident"], e: "Accusative object; Präsident is an n-declension noun, so it takes -en." },
+  // Unit 3
+  { u: 3, q: "Angesichts ___ Lage müssen wir schnell handeln.", o: ["der schwierigen", "die schwierige", "den schwierigen", "dem schwierigen"], e: "angesichts takes the genitive: der schwierigen Lage." },
+  { u: 3, q: "Es kommt ___ an, dass alle rechtzeitig informiert werden.", o: ["darauf", "daran", "dafür", "davon"], e: "ankommen auf → es kommt darauf an, dass …" },
+  { u: 3, q: "Er hängte das Bild ___ Wand.", o: ["an die", "an der", "auf die", "an den"], e: "Two-way preposition with movement (wohin?) takes the accusative: an die Wand." },
+  // Unit 4
+  { u: 4, q: "___ ich das gewusst, ___ ich früher gekommen.", o: ["Hätte – wäre", "Wäre – hätte", "Hatte – war", "Würde – würde"], e: "Past unreal condition: hätte + participle; kommen forms its perfect with sein → wäre gekommen." },
+  { u: 4, q: "Er tut so, als ___ er alles verstanden.", o: ["hätte", "hat", "würde", "wäre"], e: "als + inverted verb takes the subjunctive: als hätte er … verstanden." },
+  { u: 4, q: "Ich wünschte, ich ___ damals mehr Zeit gehabt.", o: ["hätte", "habe", "hatte", "wäre"], e: "Unreal wish about the past: hätte … gehabt." },
+  // Unit 5
+  { u: 5, q: "Der Bericht muss bis morgen ___.", o: ["fertiggestellt werden", "fertiggestellt worden", "fertigstellen werden", "fertiggestellt wird"], e: "Passive with a modal verb: modal + participle + werden." },
+  { u: 5, q: "Am Sonntag ___ in vielen Branchen nicht gearbeitet.", o: ["wird", "ist", "hat", "werden"], e: "Impersonal passive with no subject: the verb is 3rd person singular (wird)." },
+  { u: 5, q: "Es ist schade, dass das nicht ___.", o: ["hätte vermieden werden können", "vermieden werden können hätte", "hätte vermieden worden können", "vermieden hätte gekonnt"], e: "Double infinitive in a subordinate clause: the finite verb hätte goes before the whole verb group." },
+  // Unit 6
+  { u: 6, q: "Das ist der Autor, ___ Buch ich gerade lese.", o: ["dessen", "deren", "dem sein", "wessen"], e: "Genitive relative pronoun for a masculine antecedent: dessen." },
+  { u: 6, q: "Das ist alles, ___ wir gesprochen haben.", o: ["worüber", "über das", "über welches", "darüber"], e: "After alles, etwas, nichts, das: was, or wo(r)- + preposition → worüber." },
+  { u: 6, q: "___ das glaubt, der irrt sich.", o: ["Wer", "Der", "Was", "Welcher"], e: "A generalising relative clause about a person: wer …, der …" },
+  // Unit 7
+  { u: 7, q: "Er behauptet, sie nie ___.", o: ["gesehen zu haben", "zu sehen haben", "gesehen haben zu", "zu gesehen haben"], e: "Perfect infinitive: participle + zu + haben." },
+  { u: 7, q: "Er hat das Geld genommen, ___ zu fragen.", o: ["ohne", "ohne dass", "damit", "obwohl"], e: "ohne … zu + infinitive; ohne dass, damit and obwohl need a full clause." },
+  { u: 7, q: "Die Arbeiten scheinen noch nicht ___.", o: ["abgeschlossen worden zu sein", "abgeschlossen zu werden sein", "zu abschließen worden sein", "abgeschlossen sein worden"], e: "Perfect passive infinitive: participle + worden + zu sein." },
+  // Unit 8
+  { u: 8, q: "Der Plan ist teuer. ___ lohnt er sich.", o: ["Dennoch", "Obwohl", "Trotz", "Weil"], e: "dennoch is an adverb: it takes position 1 and the verb follows directly." },
+  { u: 8, q: "___ mehr ich lese, ___ besser wird mein Wortschatz.", o: ["Je – desto", "Desto – je", "Umso – je", "Wie – so"], e: "Two-part connector: je + comparative …, desto/umso + comparative …" },
+  { u: 8, q: "Er ist zwar müde, ___ er arbeitet weiter.", o: ["aber", "trotzdem", "obwohl", "deshalb"], e: "zwar … aber; aber doesn't change word order (er arbeitet). With trotzdem it would be: trotzdem arbeitet er." },
+  // Unit 9
+  { u: 9, q: "Same meaning in nominal style: „Weil die Preise stiegen, …“", o: ["Wegen des Preisanstiegs …", "Trotz des Preisanstiegs …", "Nach dem Preisanstieg …", "Bei dem Preisanstieg …"], e: "weil → wegen + genitive." },
+  { u: 9, q: "Same meaning in nominal style: „Obwohl er sich sehr bemüht hatte, …“", o: ["Trotz seiner großen Bemühungen …", "Wegen seiner großen Bemühungen …", "Bei seinen großen Bemühungen …", "Mit seinen großen Bemühungen …"], e: "obwohl → trotz + genitive." },
+  { u: 9, q: "Same meaning in nominal style: „Nachdem der Vertrag unterzeichnet worden war, …“", o: ["Nach Unterzeichnung des Vertrags …", "Vor der Unterzeichnung des Vertrags …", "Bei Unterzeichnung den Vertrag …", "Nach dem Vertrag unterzeichnen …"], e: "nachdem → nach + nominalised verb (die Unterzeichnung) + genitive object." },
+  // Unit 10
+  { u: 10, q: "Same meaning in verbal style: „Nach Abschluss der Verhandlungen …“", o: ["Nachdem die Verhandlungen abgeschlossen worden waren, …", "Nachdem die Verhandlungen abschließen, …", "Während die Verhandlungen abgeschlossen wurden, …", "Bevor die Verhandlungen abgeschlossen waren, …"], e: "nach + noun → nachdem + Plusquamperfekt (here passive)." },
+  { u: 10, q: "Die Kritik ___ der Reform wächst.", o: ["an", "über", "für", "von"], e: "The noun Kritik takes an: Kritik an etwas (like kritisieren → Kritik an)." },
+  { u: 10, q: "Same meaning: „Bei Nichterscheinen verfällt der Anspruch.“", o: ["Wenn man nicht erscheint, verfällt der Anspruch.", "Weil man nicht erscheint, verfällt der Anspruch.", "Obwohl man nicht erscheint, verfällt der Anspruch.", "Damit man nicht erscheint, verfällt der Anspruch."], e: "bei + noun usually means wenn (a condition)." },
+  // Unit 11
+  { u: 11, q: "Das Gesetz tritt am 1. Januar ___.", o: ["in Kraft", "zur Kraft", "in die Kraft", "mit Kraft"], e: "Fixed phrase: in Kraft treten (to come into force)." },
+  { u: 11, q: "Diese Frage ___ heute nicht zur Diskussion.", o: ["steht", "nimmt", "bringt", "liegt"], e: "Fixed phrase: zur Diskussion stehen." },
+  { u: 11, q: "Die Ergebnisse wurden von Experten ___ Frage gestellt.", o: ["in", "zur", "auf", "unter"], e: "Fixed phrase: etwas in Frage (infrage) stellen." },
+  // Unit 12
+  { u: 12, q: "„die Reform, die im letzten Jahr von der Regierung beschlossen wurde“ =", o: ["die im letzten Jahr von der Regierung beschlossene Reform", "die im letzten Jahr von der Regierung beschließende Reform", "die im letzten Jahr von der Regierung beschlossen Reform", "die beschlossene im letzten Jahr von der Regierung Reform"], e: "Passive meaning → Partizip II with an adjective ending, and all extensions before it." },
+  { u: 12, q: "„die Probleme, die gelöst werden müssen“ =", o: ["die zu lösenden Probleme", "die gelösten Probleme", "die lösenden Probleme", "die zu gelösten Probleme"], e: "Gerundive: zu + Partizip I + ending expresses necessity in the passive." },
+  { u: 12, q: "„ein Kind, das schnell wächst“ =", o: ["ein schnell wachsendes Kind", "ein schnell gewachsenes Kind", "ein schnell wachsende Kind", "ein schnell zu wachsendes Kind"], e: "Active meaning, happening now → Partizip I (wachsend) + ending." },
+  // Unit 14
+  { u: 14, q: "In a written news report: Der Minister erklärte, er ___ davon nichts gewusst.", o: ["habe", "hatte", "hätte gehabt", "haben"], e: "Reported speech in formal writing uses Konjunktiv I: er habe … gewusst." },
+  { u: 14, q: "In a written news report: Die Sprecherin sagte, die Kunden ___ informiert worden.", o: ["seien", "sein", "sind gewesen", "seid"], e: "Konjunktiv I of sein, 3rd person plural: seien." },
+  { u: 14, q: "In formal reported speech: Die Gäste sagten, sie ___ morgen wieder.", o: ["kämen", "kommen", "käme", "kommt"], e: "The Konjunktiv I form sie kommen looks the same as the indicative, so you switch to Konjunktiv II (kämen, or würden kommen)." },
+  // Unit 15
+  { u: 15, q: "„Das Problem kann gelöst werden.“ =", o: ["Das Problem lässt sich lösen.", "Das Problem lässt lösen.", "Das Problem ist lösen.", "Das Problem hat sich gelöst."], e: "sich lassen + infinitive = it can be done." },
+  { u: 15, q: "„Der Antrag muss bis Freitag eingereicht werden.“ =", o: ["Der Antrag ist bis Freitag einzureichen.", "Der Antrag ist bis Freitag eingereicht.", "Der Antrag hat bis Freitag einzureichen.", "Der Antrag lässt sich bis Freitag einreichen."], e: "sein + zu + infinitive = must be done (it can also mean can be done)." },
+  { u: 15, q: "„Er bekam das Paket zugeschickt.“ =", o: ["Man schickte ihm das Paket zu.", "Er schickte das Paket zu.", "Er sollte das Paket zuschicken.", "Das Paket wurde von ihm zugeschickt."], e: "bekommen-passive: the recipient becomes the subject." },
+  // Unit 16
+  { u: 16, q: "„Er will das allein geschafft haben.“ means:", o: ["Er behauptet, dass er es allein geschafft hat.", "Er möchte es allein schaffen.", "Man sagt, dass er es allein geschafft hat.", "Er hat es sicher allein geschafft."], e: "wollen + perfect infinitive = the subject claims it about himself." },
+  { u: 16, q: "Laut Medienberichten ___ der Politiker gestern zurückgetreten sein.", o: ["soll", "will", "darf", "möchte"], e: "sollen + perfect infinitive = others say so (hearsay)." },
+  { u: 16, q: "Ich schätze, das ___ etwa zwanzig Jahre her sein.", o: ["dürfte", "darf", "will", "sollst"], e: "dürfte = a cautious assumption (probably)." },
+  // Unit 17
+  { u: 17, q: "A friendly invitation: Komm ___ mal vorbei!", o: ["doch", "denn", "wohl", "etwa"], e: "doch in an imperative makes it a friendly encouragement." },
+  { u: 17, q: "Surprised, interested question: Was machst du ___ hier?", o: ["denn", "ja", "halt", "eben"], e: "denn is the typical particle in questions; ja, halt and eben don't occur in questions." },
+  { u: 17, q: "Er ist nicht gekommen. Er wird ___ krank sein.", o: ["wohl", "doch", "ja", "denn"], e: "werden + wohl = an assumption (probably)." },
+  // Unit 18
+  { u: 18, q: "Er ist zu müde, ___ er noch arbeiten könnte.", o: ["als dass", "sodass", "damit", "ohne dass"], e: "zu + adjective, als dass + Konjunktiv II = too … to …" },
+  { u: 18, q: "„Ich komme mit, vorausgesetzt, es regnet nicht.“ = Ich komme mit, ___ es nicht regnet.", o: ["sofern", "zumal", "wohingegen", "geschweige denn"], e: "sofern = provided that." },
+  { u: 18, q: "Er kann kaum gehen, ___ denn laufen.", o: ["geschweige", "es sei", "zumal", "sofern"], e: "geschweige denn = let alone (after a negative statement)." },
+  // Unit 19
+  { u: 19, q: "Which sentence negates only „heute“?", o: ["Er kommt nicht heute, sondern morgen.", "Er kommt heute nicht.", "Heute kommt er nicht.", "Nicht er kommt heute."], e: "To negate a single element, nicht goes directly before it, often with sondern." },
+  { u: 19, q: "Which sentence is correct?", o: ["Diesen Fehler hätte ich ihm nie zugetraut.", "Diesen Fehler ich hätte ihm nie zugetraut.", "Diesen Fehler hätte ihm ich nie zugetraut.", "Diesen Fehler hätte ich ihm zugetraut nie."], e: "Object fronted for emphasis; the verb stays in position 2, then the subject pronoun, then the other pronouns." },
+  { u: 19, q: "Hast du das Buch deinem Bruder gegeben? – Ja, ich habe ___ gegeben.", o: ["es ihm", "ihm es", "es zu ihm", "ihn es"], e: "Two pronouns: accusative before dative (es ihm)." },
+  // Unit 20
+  { u: 20, q: "Das bedarf ___ Erklärung.", o: ["keiner weiteren", "keine weitere", "keinen weiteren", "keinem weiteren"], e: "bedürfen takes the genitive: keiner weiteren Erklärung." },
+  { u: 20, q: "Sie war sich ___ bewusst.", o: ["der Gefahr", "die Gefahr", "über die Gefahr", "von der Gefahr"], e: "sich einer Sache bewusst sein takes the genitive." },
+  { u: 20, q: "Bei der Abstimmung enthielt er sich ___.", o: ["der Stimme", "die Stimme", "auf die Stimme", "von der Stimme"], e: "sich der Stimme enthalten (genitive) = to abstain." },
+  // Unit 21
+  { u: 21, q: "The ferryman takes us across the river:", o: ["Der Fährmann setzt uns ans andere Ufer über.", "Der Fährmann übersetzt uns ans andere Ufer.", "Der Fährmann hat uns ans andere Ufer übersetzt.", "Der Fährmann übersetzte uns ans andere Ufer."], e: "über|setzen (to ferry across) is separable; übersetzen (to translate) is inseparable." },
+  { u: 21, q: "Sie hat den Text ins Deutsche ___.", o: ["übersetzt", "übergesetzt", "geübersetzt", "überzusetzen"], e: "übersetzen = translate, inseparable, so the participle has no ge-: übersetzt." },
+  { u: 21, q: "Der Plan kann nicht durchgeführt werden. = Der Plan ist nicht ___.", o: ["durchführbar", "durchführlich", "durchgeführt", "durchführend"], e: "-bar = can be done (a passive alternative)." },
+  // Unit 22
+  { u: 22, q: "Formal equivalent of „Wir haben uns echt über eure Hilfe gefreut.“:", o: ["Für Ihre Unterstützung möchten wir uns herzlich bedanken.", "Wir haben uns total über Ihre Hilfe gefreut.", "Danke für die Hilfe, war super.", "Eure Hilfe hat uns echt gefreut."], e: "Formal register: Sie-form, no colloquial intensifiers (echt, total), complete sentences." },
+  { u: 22, q: "Most formal, nominal-style version of „Weil viele Mitarbeiter krank waren, haben wir den Termin verschoben.“:", o: ["Aufgrund zahlreicher Krankheitsfälle wurde der Termin verschoben.", "Weil viele krank waren, ist der Termin verschoben worden.", "Wegen viele Kranke haben wir den Termin verschoben.", "Viele waren krank, deshalb Termin verschoben."], e: "Nominal style: aufgrund + genitive, passive and no personal subject." },
+  { u: 22, q: "Which sentence fits a formal letter of complaint?", o: ["Ich sehe mich daher gezwungen, vom Vertrag zurückzutreten.", "Deshalb hab ich keinen Bock mehr auf den Vertrag.", "Darum steige ich jetzt einfach aus dem Vertrag aus.", "Den Vertrag könnt ihr vergessen."], e: "Formal phrases: sich gezwungen sehen, vom Vertrag zurücktreten." },
+  // Unit 23
+  { u: 23, q: "Dieser Faktor fällt kaum ins ___.", o: ["Gewicht", "Maß", "Wert", "Gewichtung"], e: "Collocation: ins Gewicht fallen (to matter)." },
+  { u: 23, q: "Die Lösung liegt doch auf der ___.", o: ["Hand", "Linie", "Seite", "Platte"], e: "Idiom: auf der Hand liegen (to be obvious)." },
+  { u: 23, q: "Wir müssen gewisse Nachteile in ___ nehmen.", o: ["Kauf", "Rechnung", "Acht", "Betracht"], e: "Idiom: etwas in Kauf nehmen (to accept a drawback)." },
+  // Unit 24
+  { u: 24, q: "Er ist ___ ruhig, in Wahrheit ist er sehr nervös.", o: ["scheinbar", "anscheinend", "offenbar", "offensichtlich"], e: "scheinbar = only looks so (but isn't); anscheinend and offenbar = apparently is so." },
+  { u: 24, q: "„Ich bleibe zu Hause, zumal es regnet.“ means:", o: ["Ich bleibe zu Hause, besonders da es auch noch regnet.", "Ich bleibe zu Hause, obwohl es regnet.", "Ich bleibe zu Hause, bis es regnet.", "Ich bleibe zu Hause, sobald es regnet."], e: "zumal adds an extra, reinforcing reason (especially since)." },
+  { u: 24, q: "Ich komme heute nicht, ich bin ___ krank.", o: ["nämlich", "denn", "deshalb", "also"], e: "nämlich gives the reason inside the clause; denn would have to start the clause (denn ich bin krank)." },
+  // Unit 25
+  { u: 25, q: "Es gibt zwei Ansätze: Ersterer ist billiger, ___ ist effektiver.", o: ["letzterer", "zweiterer", "dieser letzte", "jenerer"], e: "ersterer … letzterer = the former … the latter." },
+  { u: 25, q: "„Der Minister traf gestern den Botschafter. Letzterer zeigte sich anschließend zufrieden.“ Who was satisfied?", o: ["der Botschafter", "der Minister", "beide", "Das geht aus dem Text nicht hervor."], e: "letzterer refers to the last-mentioned person." },
+  { u: 25, q: "Er hat die Prüfung bestanden, ___ ihn sehr freute.", o: ["was", "das", "welches", "die"], e: "A relative clause about the whole previous clause starts with was." }
+];
+
+const DUNNO = "Ich weiß es nicht";
+const KEY = "placementTest.v1";
+const $ = id => document.getElementById(id);
+
+let state = load() || fresh();
+
+function fresh() {
+  return { answers: [], order: ITEMS.map(() => null), stoppedAt: null, skippedOffer: [], lesen: "", hoeren: "", writing: "", essay: "", started: null, finished: null };
+}
+function load() { try { return JSON.parse(localStorage.getItem(KEY)); } catch (e) { return null; } }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* storage unavailable: test still works */ } }
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+
+function show(id) {
+  ["intro", "quiz", "stopOffer", "results"].forEach(s => $(s).classList.toggle("hidden", s !== id));
+  window.scrollTo(0, 0);
+}
+
+function bandOf(u) { return BANDS.find(b => b.units.includes(u)); }
+
+function initIntro() {
+  const n = state.answers.length;
+  const done = state.finished || state.stoppedAt !== null;
+  $("startBtn").classList.toggle("hidden", n > 0);
+  $("resumeBtn").classList.toggle("hidden", n === 0 || done);
+  $("resultsBtn").classList.toggle("hidden", !done);
+  $("resetBtn").classList.toggle("hidden", n === 0);
+  if (n > 0 && !done) $("resumeBtn").textContent = `Resume (question ${n + 1} of ${ITEMS.length})`;
+  show("intro");
+}
+
+function renderQuestion() {
+  const i = state.answers.length;
+  if (i >= ITEMS.length) { state.finished = new Date().toISOString(); save(); renderResults(); return; }
+  const item = ITEMS[i];
+  if (!state.order[i]) { state.order[i] = shuffle(item.o); save(); }
+  const opts = state.order[i];
+  $("qMeta").textContent = `Unit ${item.u}: ${UNITS[item.u]}`;
+  $("qCount").textContent = `${i + 1} / ${ITEMS.length}`;
+  $("bar").style.width = `${(i / ITEMS.length) * 100}%`;
+  $("qText").textContent = item.q;
+  const box = $("qOptions");
+  box.innerHTML = "";
+  opts.concat([DUNNO]).forEach((text, k) => {
+    const b = document.createElement("button");
+    b.innerHTML = `<span class="key">${k + 1}</span>`;
+    b.appendChild(document.createTextNode(text));
+    if (text === DUNNO) b.classList.add("dunno");
+    b.onclick = () => answer(text);
+    box.appendChild(b);
+  });
+  show("quiz");
+}
+
+function answer(text) {
+  const i = state.answers.length;
+  state.answers.push(text);
+  save();
+  // Early-stop offer at the end of a band if that band went badly.
+  const item = ITEMS[i];
+  const next = ITEMS[i + 1];
+  const band = bandOf(item.u);
+  if (next && bandOf(next.u) !== band && !state.skippedOffer.includes(band.id)) {
+    const pct = bandScore(band).pct;
+    if (pct < 40) {
+      $("stopText").textContent = `You scored ${pct}% on the ${band.name} questions. The next questions are harder, so they won't tell us much more. You can stop here; the rest will count as not yet learned.`;
+      show("stopOffer");
+      return;
+    }
+  }
+  renderQuestion();
+}
+
+function isCorrect(i) { return state.answers[i] === ITEMS[i].o[0]; }
+
+function unitScore(u) {
+  let right = 0, asked = 0;
+  ITEMS.forEach((it, i) => { if (it.u === u) { if (i < state.answers.length) asked++; if (isCorrect(i)) right++; } });
+  return { right, asked };
+}
+
+function bandScore(band) {
+  let right = 0, total = 0;
+  ITEMS.forEach((it, i) => { if (band.units.includes(it.u)) { total++; if (i < state.answers.length && isCorrect(i)) right++; } });
+  return { right, total, pct: Math.round((right / total) * 100) };
+}
+
+const TRACKS = {
+  A: { name: "Track A: C1 → C2", length: "about 8 months of study", exam: "summer 2027 (June to August)" },
+  B: { name: "Track B: B2 → C2", length: "about 14 months of study", exam: "early 2028 (January to March)" },
+  C: { name: "Track C: B1 → C2", length: "about 19 months of study", exam: "summer 2028" }
+};
+const ORDER = ["C", "B", "A"];
+
+function grammarTrack() {
+  const b2 = bandScore(BANDS[0]).pct, c1 = bandScore(BANDS[1]).pct;
+  if (b2 < 65) return "C";
+  if (b2 >= 80 && c1 >= 70) return "A";
+  return "B";
+}
+
+function skillsTrack() {
+  const l = parseFloat(state.lesen), h = parseFloat(state.hoeren), w = state.writing;
+  if (isNaN(l) || isNaN(h) || !w) return null;
+  if (l >= 60 && h >= 60 && (w === "C1" || w === "C2")) return "A";
+  if ((l + h) / 2 < 35 || w === "B1") return "C";
+  return "B";
+}
+
+function unitAdvice(u) {
+  const { right, asked } = unitScore(u);
+  if (asked === 0) return `<span class="tag t-bad">full unit (not tested)</span>`;
+  if (right === 3) return `<span class="tag t-good">review cards only</span>`;
+  if (right === 2) return `<span class="tag t-mid">short (1–2 days)</span>`;
+  return `<span class="tag t-bad">full unit</span>`;
+}
+
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+
+function renderResults() {
+  const rows = BANDS.map(b => {
+    const s = bandScore(b);
+    const cls = s.pct >= 80 ? "t-good" : s.pct >= 60 ? "t-mid" : "t-bad";
+    return `<tr><td>${b.name}</td><td>${s.right} / ${s.total}</td><td><span class="tag ${cls}">${s.pct}%</span></td></tr>`;
+  }).join("");
+  $("bandSummary").innerHTML = `<div class="scroll"><table><tr><th>Level band</th><th>Correct</th><th>Score</th></tr>${rows}</table></div>` +
+    (state.stoppedAt !== null ? `<p class="note">You stopped after question ${state.stoppedAt}; the rest count as not yet learned.</p>` : "");
+  const g = grammarTrack();
+  $("grammarTrack").textContent = `Grammar suggests ${TRACKS[g].name}`;
+  $("grammarTrackText").textContent = `Grammar is only part of the picture. Parts 2 and 3 below check reading, listening and writing, and the final track is the more cautious of the two results.`;
+
+  $("unitTable").innerHTML = `<tr><th>Unit</th><th>Topic</th><th>Score</th><th>What to do</th></tr>` +
+    Object.keys(UNITS).map(Number).map(u => {
+      const { right, asked } = unitScore(u);
+      return `<tr><td>${u}</td><td>${UNITS[u]}</td><td>${asked ? right + "/3" : "–"}</td><td>${unitAdvice(u)}</td></tr>`;
+    }).join("");
+
+  const missed = ITEMS.map((it, i) => ({ it, i })).filter(({ i }) => i < state.answers.length && !isCorrect(i));
+  $("missed").innerHTML = missed.length ? missed.map(({ it, i }) =>
+    `<div class="card"><div class="muted">Unit ${it.u}</div><div><b>${esc(it.q)}</b></div>
+     <div class="wrong">Your answer: ${esc(state.answers[i])}</div>
+     <div class="right">Correct: ${esc(it.o[0])}</div>
+     <div class="note">${esc(it.e)}</div></div>`).join("") : "<p>None. Well done.</p>";
+
+  $("lesen").value = state.lesen; $("hoeren").value = state.hoeren;
+  $("writing").value = state.writing; $("essay").value = state.essay;
+  updateWordCount();
+  renderFinal();
+  show("results");
+}
+
+function renderFinal() {
+  const g = grammarTrack(), s = skillsTrack();
+  let html;
+  if (!s) {
+    html = `<p>Fill in Parts 2 and 3 above to get your final track. For now, grammar alone suggests <b>${TRACKS[g].name}</b>.</p>`;
+  } else {
+    const final = ORDER[Math.min(ORDER.indexOf(g), ORDER.indexOf(s))];
+    const t = TRACKS[final];
+    html = `<p class="big">${t.name}</p>
+      <p>${t.length}, at about 10–12 hours a week including listening and reading. Target exam: <b>${t.exam}</b>.</p>
+      <p class="note">Grammar suggested ${TRACKS[g].name}; reading, listening and writing suggested ${TRACKS[s].name}. The plan uses the more cautious of the two.</p>`;
+    if (Math.abs(ORDER.indexOf(g) - ORDER.indexOf(s)) >= 2) {
+      html += `<p class="tag t-mid">The two results are far apart. Book one session with a tutor to confirm your level before you commit.</p>`;
+    } else if (g !== s) {
+      html += `<p class="note">The results differ by one track. If you are unsure, one tutor session can settle it, and the week-8 checkpoint will check it again anyway.</p>`;
+    }
+  }
+  $("finalTrack").innerHTML = html;
+}
+
+function updateWordCount() {
+  const n = ($("essay").value.trim().match(/\S+/g) || []).length;
+  $("wordCount").textContent = `${n} words`;
+}
+
+function assessmentPrompt() {
+  const unitList = Object.entries(UNITS).map(([u, n]) => `${u}: ${n}`).join("\n");
+  return `You are an experienced Goethe-Institut examiner. Assess the German text below, written by a learner in 45 minutes without any help, as a placement check.
+
+Task given to the learner:
+"Immer mehr Unternehmen erlauben dauerhaftes Arbeiten im Homeoffice. Schreiben Sie einen argumentativen Text (ca. 250 Wörter): Welche Vor- und Nachteile hat das für Beschäftigte und für die Gesellschaft? Nehmen Sie begründet Stellung."
+
+Please give:
+1. A CEFR level (B1, B2, C1 or C2) for each of: task fulfilment, coherence and cohesion, vocabulary range and accuracy, grammatical range and accuracy, with one sentence of evidence each.
+2. One overall level (B1, B2, C1 or C2). Be strict: rate what is reliably shown, not what is attempted.
+3. The five most frequent or serious grammar errors, each quoted, corrected, and tagged with the matching unit number from this list:
+${unitList}
+
+Don't rewrite the whole text.
+
+Text:
+"""
+${$("essay").value.trim()}
+"""`;
+}
+
+function copyText(text) {
+  if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+  const ta = document.createElement("textarea");
+  ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta); ta.select();
+  const ok = document.execCommand("copy");
+  document.body.removeChild(ta);
+  return ok ? Promise.resolve() : Promise.reject();
+}
+
+let timerHandle = null;
+function startTimer() {
+  const end = Date.now() + 45 * 60 * 1000;
+  clearInterval(timerHandle);
+  timerHandle = setInterval(() => {
+    const left = Math.max(0, end - Date.now());
+    const m = Math.floor(left / 60000), s = Math.floor((left % 60000) / 1000);
+    $("timer").textContent = left ? `${m}:${String(s).padStart(2, "0")} left` : "Time is up. Finish your sentence.";
+    if (!left) clearInterval(timerHandle);
+  }, 1000);
+}
+
+function exportResults() {
+  const data = {
+    test: "placement", version: 1, exported: new Date().toISOString(),
+    bands: BANDS.map(b => ({ id: b.id, name: b.name, ...bandScore(b) })),
+    units: Object.keys(UNITS).map(Number).map(u => ({ unit: u, name: UNITS[u], ...unitScore(u) })),
+    items: ITEMS.map((it, i) => ({ unit: it.u, question: it.q, correct: it.o[0], answer: state.answers[i] ?? null })),
+    grammarTrack: grammarTrack(), skillsTrack: skillsTrack(),
+    lesen: state.lesen, hoeren: state.hoeren, writing: state.writing, essay: state.essay
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `placement-results-${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+function restart() {
+  if (!confirm("Delete all answers and start over?")) return;
+  state = fresh(); save(); initIntro();
+}
+
+$("startBtn").onclick = () => { state.started = new Date().toISOString(); save(); renderQuestion(); };
+$("resumeBtn").onclick = renderQuestion;
+$("resultsBtn").onclick = renderResults;
+$("resetBtn").onclick = restart;
+$("restartBtn").onclick = restart;
+$("stopBtn").onclick = () => { state.stoppedAt = state.answers.length; save(); renderResults(); };
+$("continueBtn").onclick = () => { state.skippedOffer.push(bandOf(ITEMS[state.answers.length - 1].u).id); save(); renderQuestion(); };
+$("lesen").oninput = e => { state.lesen = e.target.value; save(); renderFinal(); };
+$("hoeren").oninput = e => { state.hoeren = e.target.value; save(); renderFinal(); };
+$("writing").onchange = e => { state.writing = e.target.value; save(); renderFinal(); };
+$("essay").oninput = e => { state.essay = e.target.value; save(); updateWordCount(); };
+$("timerBtn").onclick = startTimer;
+$("copyBtn").onclick = () => {
+  if (!$("essay").value.trim()) { $("copyMsg").textContent = "Write your text first."; return; }
+  copyText(assessmentPrompt()).then(() => $("copyMsg").textContent = "Copied. Paste it into a new Claude chat.",
+    () => $("copyMsg").textContent = "Copy failed. Select the text manually.");
+};
+$("exportBtn").onclick = exportResults;
+$("printBtn").onclick = () => window.print();
+
+document.addEventListener("keydown", e => {
+  if ($("quiz").classList.contains("hidden")) return;
+  const k = parseInt(e.key, 10);
+  const buttons = $("qOptions").querySelectorAll("button");
+  if (k >= 1 && k <= buttons.length) buttons[k - 1].click();
+});
+
+initIntro();
+</script>
+</body>
+</html>
