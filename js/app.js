@@ -10,6 +10,9 @@ const SYNC_KEY = "germanTutor.sync";      // per device: repository and access k
 const TYPE_NAMES = { L: "Gap fill", T: "Transformation", E: "Find the error", O: "Word order", S: "Combine sentences", M: "Multiple choice" };
 const OPEN_TYPES = ["T", "S", "E"];          // more than one answer can be right: unmatched answers are "unsure"
 const TIME_LIMIT = { L: 25, M: 20, O: 40, T: 60, S: 60, E: 45 };  // seconds per item in timed mode
+const SPRINT_LIMIT = { L: 15, M: 8 };       // seconds per item in the endings sprint
+const SPRINT_GOAL = { pct: 90, sec: 8 };    // plan v3: 90% right at under 8 seconds an item
+const CAT_NAMES = { G1: "Gender (der, die, das)", G2: "Choosing the case", G3: "Ending pattern" };
 const REVIEW_MODES = ["mixed", "check", "warm"];     // the modes that count towards mastery
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -30,6 +33,7 @@ function fresh() {
     errorLog: [],      // { date, unit, node, error, correction, rule, task, src }
     cards: [],         // { k, front, back, tags, t, exported }
     checkpoints: [],   // { t, right, n, units: { u: [right, n] } }
+    sprints: [],       // { t, right, n, sec, cats: { G1: [right, n] } } endings sprints
     mocks: [],         // { date, module, source, score, t }
     time: [],          // { t, k: A|B|anki|listen, min } study time log
     gone: {},          // deleted things, key → time, so sync doesn't bring them back
@@ -162,7 +166,7 @@ function loadBank() {
     s.onerror = () => { console.warn("Exercise file missing:", f); res(); };
     document.head.appendChild(s);
   }))).then(() => {
-    Object.values(GT.sets).forEach(set => set.items.forEach(it => { it.unit = String(it.unit); ITEMS[it.id] = it; }));
+    Object.values(GT.sets).forEach(set => set.items.forEach(it => { it.unit = String(it.unit); if (set.thread) it.thread = set.thread; ITEMS[it.id] = it; }));
   });
 }
 const unitItems = u => (GT.sets[String(u)] || { items: [] }).items;
@@ -237,7 +241,7 @@ function drillCard(it) {
   else if (it.type === "E") front += `Find the error: ${it.prompt}`;
   else front += it.prompt;
   const back = `${solutionText(it)}\n${it.explain}`;
-  addCard("d:" + it.id, front, back, `unit::${unitTag(it.unit)} node::${it.node} type::drill`);
+  addCard("d:" + it.id, front, back, `unit::${unitTag(it.unit)} node::${it.node} type::drill${it.thread ? " thread::" + it.thread : ""}`);
 }
 function ankiFile(cards) {
   const head = "#separator:Semicolon\n#html:false\n#notetype:Basic\n#deck:German C2\n#tags column:3\n";
@@ -356,13 +360,15 @@ function sessionSteps(u, week) {
   return {
     A: [
       [10, "Mixed warm-up", "12 items from earlier units, shuffled.", "warm"],
+      [10, "Endings sprint", "20 genders and short phrases against the clock. Do it twice if there is time.", "sprint"],
       second ? [25, "Timed drill", "The same grammar against the clock.", "timed"]
         : [20, "The new rule", GT.NOTES[u] ? "Read the rule, the model sentences and the notes for Hungarian speakers below." : "Read the rule in your reference grammar: this unit has no page in the app yet.", null],
-      [second ? 35 : 40, "Unit drills", "New items first, then the ones you missed.", "new"],
+      [second ? 25 : 30, "Unit drills", "New items first, then the ones you missed.", "new"],
       [10, "Error spotting", "Find and correct the errors, then download the new Anki cards.", "E"]
     ],
     B: [
-      [10, "Mixed warm-up", "12 items from earlier units, shuffled.", "warm"],
+      [5, "Mixed warm-up", "12 items from earlier units, shuffled.", "warm"],
+      [5, "Endings sprint", "20 genders and short phrases against the clock.", "sprint"],
       [35, "Writing task", second ? "The longer task or the speaking task of this unit." : "A timed text that needs this unit's grammar.", "write"],
       [25, "Feedback from Claude", "Copy for Claude, read the correction and paste the reply back. The errors go to the log and to Anki.", null],
       [10, "Unit drills, second round", "Only what you missed.", "new"],
@@ -374,6 +380,7 @@ function sessionSteps(u, week) {
 function actionButton(a, u) {
   const map = {
     warm: ["Start warm-up", () => startSession("warm", u), unitsSoFar().some(hasSet)],
+    sprint: ["Start sprint", () => startSession("sprint", u), threadItems("G").length > 0],
     new: ["Drill: new and missed", () => startSession("new", u), hasSet(u)],
     all: ["Drill the whole unit", () => startSession("all", u), hasSet(u)],
     E: ["Find the errors", () => startSession("E", u), unitItems(u).some(i => i.type === "E")],
@@ -505,6 +512,7 @@ function renderDrills() {
       <h2>Across units</h2>
       <p>Units so far on your track: ${unitsSoFar().filter(hasSet).map(unitName).join(", ") || "none with a set yet"}.</p>
       <div class="row">
+        <button data-m="sprint" ${threadItems("G").length ? "" : "disabled"}>Endings sprint (20)</button>
         <button data-m="mixed">Mixed review (20)</button>
         <button data-m="check">Weekly checkpoint (20)</button>
       </div>
@@ -537,6 +545,14 @@ function renderDrills() {
 
 let session = null, itemTimer = null;
 
+const threadItems = t => (GT.sets["thread" + t] || { items: [] }).items;
+// Right and total per error category (G1 gender, G2 case, G3 ending pattern) for a list of attempts.
+function sprintCats(atts) {
+  const m = {};
+  atts.forEach(a => { const it = ITEMS[a.id]; if (!it || !it.cat) return; m[it.cat] = m[it.cat] || [0, 0]; m[it.cat][1]++; if (a.r === "R") m[it.cat][0]++; });
+  return m;
+}
+
 function startSession(mode, u) {
   let items = [];
   const so = unitsSoFar().filter(hasSet);
@@ -554,6 +570,14 @@ function startSession(mode, u) {
       if (!l) return 3;
       return 1 + (l.r !== "R" ? 4 : 0) + Math.min((Date.now() - l.t) / 864e5, 14) / 7;
     }, mode === "warm" ? 12 : 20);
+  } else if (mode === "sprint") {
+    // 20 thread items; unseen, missed and stale ones are favoured, and so is the weakest category
+    const acc = sprintCats(S.attempts.filter(a => a.m === "sprint").slice(-60));
+    items = weightedSample(threadItems("G"), it => {
+      const l = lastResult(it.id), c = acc[it.cat];
+      const base = !l ? 3 : 1 + (l.r !== "R" ? 4 : 0) + Math.min((Date.now() - l.t) / 864e5, 14) / 7;
+      return base * (c && c[1] >= 5 ? 2 - c[0] / c[1] : 1.5);
+    }, 20);
   } else if (mode === "check") {
     // spread 20 items evenly over the units so far
     const per = so.map(x => shuffle(unitItems(x)));
@@ -561,7 +585,7 @@ function startSession(mode, u) {
     items = shuffle(items);
   }
   if (!items.length) { toast("No items for this choice yet."); return; }
-  session = { mode, unit: u, items, i: 0, results: [], timed: mode === "timed", done: false };
+  session = { mode, unit: u, items, i: 0, results: [], timed: mode === "timed" || mode === "sprint", done: false };
   prepItem();
   go("session");
 }
@@ -569,12 +593,13 @@ function startSession(mode, u) {
 function prepItem() {
   const it = session.items[session.i];
   session.checked = null; session.choice = null;
-  session.order = it.type === "M" ? shuffle(it.options) : null;
+  session.order = it.type === "M" ? (it.thread ? it.options.slice() : shuffle(it.options)) : null;   // der/die/das keep their order
+  session.shown = Date.now();
   session.pool = it.type === "O" ? shuffle(it.words.map((w, k) => k)) : null;
   session.placed = [];
 }
 
-const MODE_NAMES = { new: "New and missed", all: "Whole unit", E: "Find the errors", timed: "Timed drill", mixed: "Mixed review", warm: "Warm-up", check: "Weekly checkpoint" };
+const MODE_NAMES = { new: "New and missed", all: "Whole unit", E: "Find the errors", timed: "Timed drill", mixed: "Mixed review", warm: "Warm-up", check: "Weekly checkpoint", sprint: "Endings sprint" };
 
 function renderSession() {
   if (session.done) return renderSummary();
@@ -644,7 +669,7 @@ function renderSession() {
     $$(".options button").forEach(b => { b.onclick = () => { session.choice = session.order[b.dataset.o]; doCheck(); }; });
     $$("#pool .tile").forEach(b => { b.onclick = () => { session.placed.push(session.pool.splice(b.dataset.q, 1)[0]); renderSession(); }; });
     $$("#placed .tile").forEach(b => { b.onclick = () => { session.pool.push(session.placed.splice(b.dataset.p, 1)[0]); renderSession(); }; });
-    if (session.timed && !itemTimer) startItemTimer(TIME_LIMIT[it.type] || 30);
+    if (session.timed && !itemTimer) startItemTimer((session.mode === "sprint" ? SPRINT_LIMIT : TIME_LIMIT)[it.type] || 30);
   } else {
     $("#nextBtn").onclick = nextItem;
     $("#nextBtn").focus();
@@ -690,6 +715,11 @@ function doCheck(dunno, timeout) {
   session.checked = { att, given, note: j.note };
   session.results.push(att);
   renderSession();
+  if (session.mode === "sprint") {
+    att.d = Date.now() - session.shown; saveSoon();
+    const at = session.i;   // a right answer moves on by itself, so the sprint keeps its pace
+    if (j.r === "R") setTimeout(() => { if (session && session.mode === "sprint" && session.i === at && !session.done) nextItem(); }, 700);
+  }
 }
 
 function nextItem() {
@@ -708,6 +738,14 @@ function renderSummary() {
   };
   const nodes = byKey("n"), units = byKey("u");
   const missed = res.filter(a => a.r !== "R");
+  const sprint = session.mode === "sprint";
+  const cats = sprint ? sprintCats(res) : null;
+  const rightTimes = res.filter(a => a.r === "R" && a.d).map(a => a.d / 1000);
+  const sec = rightTimes.length ? Math.round(rightTimes.reduce((x, y) => x + y, 0) / rightTimes.length * 10) / 10 : null;
+  if (sprint && !session.saved) {
+    S.sprints.push({ t: Date.now(), right, n: res.length, sec, cats });
+    session.saved = true; save();
+  }
   if (session.mode === "check" && !session.saved) {
     S.checkpoints.push({ t: Date.now(), right, n: res.length, units });
     session.saved = true; save();
@@ -715,7 +753,12 @@ function renderSummary() {
   view().innerHTML = `
     <div class="card">
       <h2>${esc(MODE_NAMES[session.mode])}: ${right} / ${res.length} (${pct(right, res.length)}%)</h2>
-      <div class="scroll"><table><thead><tr><th>${session.mode === "check" ? "Unit" : "Node"}</th><th>Score</th></tr></thead><tbody>
+      ${sprint ? `<p>${sec === null ? "" : `Average time for a right answer: <b>${sec} s</b>. `}Target: ${SPRINT_GOAL.pct}% right at under ${SPRINT_GOAL.sec} seconds.
+        ${pct(right, res.length) >= SPRINT_GOAL.pct && sec !== null && sec < SPRINT_GOAL.sec ? `<span class="tag t-good">target reached</span>` : ""}</p>
+      <div class="scroll"><table><thead><tr><th>Kind of error</th><th>Score</th></tr></thead><tbody>
+        ${Object.keys(CAT_NAMES).filter(k => cats[k]).map(k => `<tr><td>${esc(CAT_NAMES[k])}</td><td>${cats[k][0]}/${cats[k][1]}</td></tr>`).join("")}
+      </tbody></table></div>` : ""}
+      <div class="scroll ${sprint ? "hidden" : ""}"><table><thead><tr><th>${session.mode === "check" ? "Unit" : "Node"}</th><th>Score</th></tr></thead><tbody>
         ${Object.entries(session.mode === "check" ? units : nodes).map(([k, [r, n]]) => `<tr><td>${esc(session.mode === "check" ? unitName(k) + ": " + UNIT(k).name : k + " " + GT.NODES[k])}</td><td>${r}/${n} <span class="tag ${pct(r, n) >= 85 ? "t-good" : pct(r, n) >= 60 ? "t-mid" : "t-bad"}">${pct(r, n)}%</span></td></tr>`).join("")}
       </tbody></table></div>
       ${missed.length ? `<h3>Not right this time</h3><ul class="list">${missed.map(a => { const it = ITEMS[a.id]; return `<li>${a.r === "U" ? `<span class="tag t-mid">unsure</span> ` : ""}${esc(solutionText(it))}${a.a ? ` <span class="muted">(you: ${esc(a.a)})</span>` : ""}</li>`; }).join("")}</ul>
@@ -1017,7 +1060,7 @@ function tickWrite() {
 // ---------- Progress and error log (M3) ----------
 
 function nodeStats(node) {
-  const atts = S.attempts.filter(a => a.n === node);
+  const atts = S.attempts.filter(a => a.n === node && a.m !== "sprint");
   const recent = atts.slice(-20);
   const weeks = {};
   atts.filter(a => REVIEW_MODES.includes(a.m) && a.r !== "U").forEach(a => {
@@ -1053,7 +1096,19 @@ function renderProgress() {
   const log = S.errorLog.filter(e => !logFilter || e.unit === logFilter).slice().reverse();
   const totalR = S.attempts.filter(a => a.r === "R").length;
 
+  const sprints = S.sprints.slice(-5).reverse();
+  const catAll = sprintCats(S.attempts.filter(a => a.m === "sprint").slice(-100));
   view().innerHTML = `
+    <div class="card">
+      <h2>Endings sprint</h2>
+      ${sprints.length ? `
+        <p>Target: ${SPRINT_GOAL.pct}% right at under ${SPRINT_GOAL.sec} seconds an item. Your last 100 answers by kind of error:
+          ${Object.keys(CAT_NAMES).filter(k => catAll[k]).map(k => `${esc(CAT_NAMES[k])} <b>${pct(...catAll[k])}%</b>`).join(" · ")}</p>
+        <div class="scroll"><table><thead><tr><th>Date</th><th>Score</th><th>Seconds per right answer</th></tr></thead><tbody>
+          ${sprints.map(s => `<tr><td>${esc(localDate(new Date(s.t)))}</td><td>${s.right}/${s.n} <span class="tag ${pct(s.right, s.n) >= SPRINT_GOAL.pct ? "t-good" : pct(s.right, s.n) >= 70 ? "t-mid" : "t-bad"}">${pct(s.right, s.n)}%</span></td><td>${s.sec ?? "—"}</td></tr>`).join("")}
+        </tbody></table></div>`
+      : `<p class="muted">No sprint yet. It is part of every session: 20 genders and short phrases against the clock.</p>`}
+    </div>
     <div class="grid2">
       <div class="card"><h2>Drill answers</h2><p><span class="stat">${S.attempts.length}</span> · ${pct(totalR, S.attempts.length) ?? "—"}% right</p></div>
       <div class="card"><h2>Writing tasks</h2><p><span class="stat">${S.production.length}</span> corrected${S.production.length ? ` · last overall ${esc((S.production[S.production.length - 1].levels || {}).overall || "—")}` : ""}</p></div>
@@ -1422,6 +1477,7 @@ function mergeStates(a, b) {
     .filter(c => c.exported || !((gone["c:" + c.k] || 0) > c.t))
     .sort((x, y) => x.t - y.t || (x.k < y.k ? -1 : x.k > y.k ? 1 : 0));
   m.checkpoints = union(a.checkpoints, b.checkpoints, x => x.t).sort(by(x => x.t));
+  m.sprints = union(a.sprints, b.sprints, x => x.t).sort(by(x => x.t));
   m.mocks = union(a.mocks, b.mocks, x => JSON.stringify(x)).filter(x => !gone["m:" + JSON.stringify(x)]).sort(by(x => (x.date || "") + JSON.stringify(x)));
   m.time = union(a.time, b.time, x => x.t + x.k).filter(x => !gone["t:" + x.t]).sort(by(x => x.t));
   m.lastBackup = [a.lastBackup, b.lastBackup].filter(Boolean).sort().pop() || null;

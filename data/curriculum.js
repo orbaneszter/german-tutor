@@ -3,10 +3,11 @@
 "use strict";
 window.GT = window.GT || {};
 GT.sets = GT.sets || {};
-GT.addSet = function (set) { GT.sets[String(set.unit)] = set; };
+// A set belongs to a unit, or to a thread that runs through all units (thread "G" → GT.sets.threadG).
+GT.addSet = function (set) { GT.sets[set.thread ? "thread" + set.thread : String(set.unit)] = set; };
 
 // Exercise set files in data/. Add a file here when Claude Code writes a new unit.
-GT.BANK_FILES = ["unit01.js", "unit02.js", "unit03.js"];
+GT.BANK_FILES = ["unit01.js", "unit02.js", "unit03.js", "threadG.js"];
 
 GT.NODES = {
   F1: "Tenses: Perfekt, Präteritum, Plusquamperfekt",

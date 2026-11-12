@@ -16,7 +16,7 @@ REQUIRED = ["id", "unit", "node", "type", "level", "prompt", "answers", "explain
 
 def read_curriculum():
     text = (DATA / "curriculum.js").read_text(encoding="utf-8")
-    files = re.findall(r'"(unit[\w]+\.js)"', re.search(r"BANK_FILES\s*=\s*\[(.*?)\]", text, re.S).group(1))
+    files = re.findall(r'"((?:unit|thread)\w+\.js)"', re.search(r"BANK_FILES\s*=\s*\[(.*?)\]", text, re.S).group(1))
     unit_nodes = {}
     for uid, nodes in re.findall(r'\{ id: "(\w+)",[^}]*?nodes: \[([^\]]*)\]', text):
         unit_nodes[uid] = re.findall(r'"(\w+)"', nodes)
@@ -41,7 +41,7 @@ def main():
     errors, warnings = [], []
     files, unit_nodes = read_curriculum()
     listed = set(files)
-    on_disk = {p.name for p in DATA.glob("unit*.js")}
+    on_disk = {p.name for p in DATA.glob("unit*.js")} | {p.name for p in DATA.glob("thread*.js")}
     for f in sorted(on_disk - listed):
         errors.append(f"{f}: file exists but is not listed in GT.BANK_FILES")
     for f in sorted(listed - on_disk):
@@ -54,9 +54,11 @@ def main():
         except (ValueError, json.JSONDecodeError) as e:
             errors.append(f"{name}: can't parse ({e})")
             continue
-        unit = str(data.get("unit"))
-        if unit not in unit_nodes:
-            errors.append(f"{name}: unknown unit {unit}")
+        # A thread set (thread "G" …) runs through all units: each item names its own unit.
+        thread = data.get("thread")
+        file_unit = str(data.get("unit"))
+        if not thread and file_unit not in unit_nodes:
+            errors.append(f"{name}: unknown unit {file_unit}")
             continue
         for it in data.get("items", []):
             total += 1
@@ -69,10 +71,17 @@ def main():
             if iid in seen_ids:
                 errors.append(f"{where}: duplicate id (also in {seen_ids[iid]})")
             seen_ids[iid] = name
-            if not re.fullmatch(rf"u{unit.zfill(2)}-\d{{3}}", iid):
-                warnings.append(f"{where}: id doesn't follow u{unit.zfill(2)}-NNN")
+            unit = str(it["unit"]) if thread else file_unit
+            prefix = f"t{thread}" if thread else f"u{unit.zfill(2)}"
+            if not re.fullmatch(rf"{prefix}-\d{{3}}", iid):
+                warnings.append(f"{where}: id doesn't follow {prefix}-NNN")
+            if unit not in unit_nodes:
+                errors.append(f"{where}: unknown unit {unit}")
+                continue
             if str(it["unit"]) != unit:
                 errors.append(f"{where}: unit {it['unit']} doesn't match the file's unit {unit}")
+            if thread and it.get("cat") not in {"G1", "G2", "G3"}:
+                errors.append(f"{where}: thread items need a category (cat)")
             if it["node"] not in unit_nodes[unit]:
                 errors.append(f"{where}: node {it['node']} doesn't belong to unit {unit} ({', '.join(unit_nodes[unit])})")
             t = it["type"]
