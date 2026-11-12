@@ -4,7 +4,7 @@ GT.addSet(
  "unit": 4,
  "version": 1,
  "written": "2026-11-12",
- "reviewed": false,
+ "reviewed": true,
  "items": [
   {
    "id": "u04-001",
@@ -84,7 +84,7 @@ GT.addSet(
    "node": "N07",
    "type": "L",
    "level": "B2",
-   "prompt": "___ Sie mir bitte helfen? (können)",
+   "prompt": "___ Sie mir bitte helfen? (können, Konjunktiv II)",
    "answers": [
     "Könnten"
    ],
@@ -206,11 +206,11 @@ GT.addSet(
    "node": "N07",
    "type": "L",
    "level": "B2",
-   "prompt": "Es ___ besser, wenn du jetzt gehst. (sein)",
+   "prompt": "Es ___ besser, wenn du jetzt gehen würdest. (sein)",
    "answers": [
     "wäre"
    ],
-   "explain": "A careful suggestion: Es wäre besser, wenn …"
+   "explain": "A careful suggestion: Es wäre besser, wenn … The wenn-clause is unreal too, so it also takes the Konjunktiv II."
   },
   {
    "id": "u04-018",
@@ -289,7 +289,9 @@ GT.addSet(
     "Hätte ich Zeit, würde ich mitkommen.",
     "Hätte ich Zeit, käme ich mit.",
     "Ich würde mitkommen, wenn ich Zeit hätte.",
-    "Ich käme mit, wenn ich Zeit hätte."
+    "Ich käme mit, wenn ich Zeit hätte.",
+    "Wenn ich Zeit hätte, dann würde ich mitkommen.",
+    "Wenn ich Zeit hätte, dann käme ich mit."
    ],
    "explain": "The real situation is negative, so the unreal condition is positive: hätte in the wenn-clause, würde + infinitive in the main clause."
   },
@@ -307,7 +309,9 @@ GT.addSet(
     "Er könnte arbeiten, wenn er nicht krank wäre.",
     "Wenn er gesund wäre, könnte er arbeiten.",
     "Wäre er gesund, könnte er arbeiten.",
-    "Er könnte arbeiten, wenn er gesund wäre."
+    "Er könnte arbeiten, wenn er gesund wäre.",
+    "Wenn er nicht krank wäre, dann könnte er arbeiten.",
+    "Wenn er gesund wäre, dann könnte er arbeiten."
    ],
    "explain": "sein → wäre, können → könnte. Modal verbs use their own form, not würde."
   },
@@ -322,7 +326,10 @@ GT.addSet(
    "answers": [
     "Wenn ich den Wecker gehört hätte, wäre ich nicht zu spät gekommen.",
     "Hätte ich den Wecker gehört, wäre ich nicht zu spät gekommen.",
-    "Ich wäre nicht zu spät gekommen, wenn ich den Wecker gehört hätte."
+    "Ich wäre nicht zu spät gekommen, wenn ich den Wecker gehört hätte.",
+    "Wenn ich den Wecker gehört hätte, dann wäre ich nicht zu spät gekommen.",
+    "Wenn ich den Wecker gehört hätte, wäre ich pünktlich gekommen.",
+    "Hätte ich den Wecker gehört, wäre ich pünktlich gekommen."
    ],
    "explain": "Past: hätte/wäre + participle in both clauses. The auxiliary is the same as in the Perfekt: hat gehört → hätte gehört, ist gekommen → wäre gekommen."
   },
@@ -338,7 +345,8 @@ GT.addSet(
     "Wenn sie gelernt hätte, hätte sie die Prüfung bestanden.",
     "Hätte sie gelernt, hätte sie die Prüfung bestanden.",
     "Sie hätte die Prüfung bestanden, wenn sie gelernt hätte.",
-    "Wenn sie gelernt hätte, dann hätte sie die Prüfung bestanden."
+    "Wenn sie gelernt hätte, dann hätte sie die Prüfung bestanden.",
+    "Hätte sie gelernt, dann hätte sie die Prüfung bestanden."
    ],
    "explain": "Past Konjunktiv II in both clauses: hätte gelernt …, hätte bestanden."
   },
@@ -356,7 +364,14 @@ GT.addSet(
     "Wenn es nicht regnen würde, gingen wir spazieren.",
     "Würde es nicht regnen, würden wir spazieren gehen.",
     "Wir würden spazieren gehen, wenn es nicht regnen würde.",
-    "Wir würden spazieren gehen, wenn es nicht regnete."
+    "Wir würden spazieren gehen, wenn es nicht regnete.",
+    "Wenn es nicht regnete, gingen wir spazieren.",
+    "Wenn es nicht regnen würde, dann würden wir spazieren gehen.",
+    "Würde es nicht regnen, gingen wir spazieren.",
+    "Regnete es nicht, würden wir spazieren gehen.",
+    "Regnete es nicht, gingen wir spazieren.",
+    "Wir gingen spazieren, wenn es nicht regnen würde.",
+    "Wir gingen spazieren, wenn es nicht regnete."
    ],
    "explain": "Regular verbs normally use würde + infinitive, because their Konjunktiv II looks like the Präteritum (regnete)."
   },
@@ -376,7 +391,10 @@ GT.addSet(
     "Hätte ich doch ein Auto!",
     "Hätte ich doch nur ein Auto!",
     "Hätte ich nur ein Auto!",
-    "Hätte ich bloß ein Auto!"
+    "Hätte ich bloß ein Auto!",
+    "Wenn ich doch bloß ein Auto hätte!",
+    "Hätte ich doch bloß ein Auto!",
+    "Ich wünschte, ich hätte ein Auto."
    ],
    "explain": "Unreal wish: wenn + Konjunktiv II with doch, nur or bloß, or the verb first without wenn."
   },
@@ -396,7 +414,10 @@ GT.addSet(
     "Hätte ich ihm doch die Wahrheit gesagt!",
     "Hätte ich ihm doch nur die Wahrheit gesagt!",
     "Hätte ich ihm nur die Wahrheit gesagt!",
-    "Hätte ich ihm bloß die Wahrheit gesagt!"
+    "Hätte ich ihm bloß die Wahrheit gesagt!",
+    "Wenn ich ihm doch bloß die Wahrheit gesagt hätte!",
+    "Hätte ich ihm doch bloß die Wahrheit gesagt!",
+    "Ich wünschte, ich hätte ihm die Wahrheit gesagt."
    ],
    "explain": "A wish about the past: hätte + participle, with doch, nur or bloß."
   },
@@ -414,7 +435,9 @@ GT.addSet(
     "Könnten Sie das Fenster bitte öffnen?",
     "Würden Sie das Fenster öffnen?",
     "Würden Sie bitte das Fenster öffnen?",
-    "Würden Sie das Fenster bitte öffnen?"
+    "Würden Sie das Fenster bitte öffnen?",
+    "Könnten Sie vielleicht das Fenster öffnen?",
+    "Würden Sie vielleicht das Fenster öffnen?"
    ],
    "explain": "The Konjunktiv II makes a request more polite: Könnten Sie …? Würden Sie …?"
   },
@@ -445,9 +468,14 @@ GT.addSet(
     "Er redet so, als wäre er der Chef.",
     "Er redet so, als wenn er der Chef wäre.",
     "Er redet, als ob er der Chef wäre.",
-    "Er redet, als wäre er der Chef."
+    "Er redet, als wäre er der Chef.",
+    "Er redet, als wenn er der Chef wäre.",
+    "Er redet so, als ob er der Chef sei.",
+    "Er redet so, als sei er der Chef.",
+    "Er redet, als ob er der Chef sei.",
+    "Er redet, als sei er der Chef."
    ],
-   "explain": "Unreal comparison: als ob + verb last, or als + verb directly after it, both with the Konjunktiv II."
+   "explain": "Unreal comparison: als ob + verb last, or als + verb directly after it, both with the Konjunktiv II. (The Konjunktiv I, sei, is also possible in formal writing.)"
   },
   {
    "id": "u04-033",
@@ -460,7 +488,11 @@ GT.addSet(
    "answers": [
     "Sie tut so, als ob sie nichts gehört hätte.",
     "Sie tut so, als hätte sie nichts gehört.",
-    "Sie tut so, als wenn sie nichts gehört hätte."
+    "Sie tut so, als wenn sie nichts gehört hätte.",
+    "Sie tut, als ob sie nichts gehört hätte.",
+    "Sie tut, als hätte sie nichts gehört.",
+    "Sie tut so, als ob sie nichts gehört habe.",
+    "Sie tut so, als habe sie nichts gehört."
    ],
    "explain": "The comparison refers to the past, so: hätte + participle."
   },
@@ -778,7 +810,8 @@ GT.addSet(
     "gekommen"
    ],
    "answers": [
-    "Hätte ich das gewusst, wäre ich früher gekommen."
+    "Hätte ich das gewusst, wäre ich früher gekommen.",
+    "Hätte ich das früher gewusst, wäre ich gekommen."
    ],
    "explain": "A condition without wenn starts with the verb; the main clause then also starts with its verb."
   },
@@ -820,7 +853,8 @@ GT.addSet(
     "wüsste"
    ],
    "answers": [
-    "Er tut so, als ob er nichts davon wüsste."
+    "Er tut so, als ob er nichts davon wüsste.",
+    "Er tut so, als ob er davon nichts wüsste."
    ],
    "explain": "als ob + subordinate clause: the verb (wüsste) is last."
   },
@@ -905,8 +939,7 @@ GT.addSet(
     "ist"
    ],
    "answers": [
-    "Könnten Sie mir bitte sagen, wie spät es ist?",
-    "Könnten Sie bitte mir sagen, wie spät es ist?"
+    "Könnten Sie mir bitte sagen, wie spät es ist?"
    ],
    "explain": "A polite request with an indirect question: in the indirect question the verb (ist) is last."
   },
@@ -952,7 +985,9 @@ GT.addSet(
     "erreicht"
    ],
    "answers": [
-    "Wenn sie früher losgefahren wären, hätten sie den Zug erreicht."
+    "Wenn sie früher losgefahren wären, hätten sie den Zug erreicht.",
+    "Wenn sie losgefahren wären, hätten sie den Zug früher erreicht.",
+    "Wenn sie losgefahren wären, hätten sie früher den Zug erreicht."
    ],
    "explain": "wenn-clause: participle + wären at the end; the main clause starts with hätten."
   }

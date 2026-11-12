@@ -4,7 +4,7 @@ GT.addSet(
  "unit": 5,
  "version": 1,
  "written": "2026-11-12",
- "reviewed": false,
+ "reviewed": true,
  "items": [
   {
    "id": "u05-001",
@@ -287,7 +287,9 @@ GT.addSet(
     "Der Vertrag ist vom Chef unterschrieben worden.",
     "Der Vertrag ist von dem Chef unterschrieben worden.",
     "Vom Chef ist der Vertrag unterschrieben worden.",
-    "Der Vertrag wurde vom Chef unterschrieben."
+    "Der Vertrag wurde vom Chef unterschrieben.",
+    "Vom Chef wurde der Vertrag unterschrieben.",
+    "Der Vertrag wurde von dem Chef unterschrieben."
    ],
    "explain": "Perfekt passive: ist + participle + worden; the doer takes von + dative."
   },
@@ -315,7 +317,8 @@ GT.addSet(
    "prompt": "Die Polizei verhaftete den Täter.",
    "answers": [
     "Der Täter wurde von der Polizei verhaftet.",
-    "Von der Polizei wurde der Täter verhaftet."
+    "Von der Polizei wurde der Täter verhaftet.",
+    "Der Täter ist von der Polizei verhaftet worden."
    ],
    "explain": "Präteritum passive: wurde + participle; den Täter becomes der Täter."
   },
@@ -375,7 +378,10 @@ GT.addSet(
     "Viele Bäume sind vom Sturm zerstört worden.",
     "Durch den Sturm sind viele Bäume zerstört worden.",
     "Viele Bäume wurden durch den Sturm zerstört.",
-    "Viele Bäume wurden vom Sturm zerstört."
+    "Viele Bäume wurden vom Sturm zerstört.",
+    "Durch den Sturm wurden viele Bäume zerstört.",
+    "Vom Sturm wurden viele Bäume zerstört.",
+    "Vom Sturm sind viele Bäume zerstört worden."
    ],
    "explain": "A cause that is not a person usually takes durch + accusative (von is also used for forces of nature)."
   },

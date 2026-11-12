@@ -212,7 +212,7 @@ GT.NOTES = {
       "Du hättest mir das früher sagen sollen."
     ],
     hu: [
-      "Hungarian builds the conditional with one ending (-na, -ne: tudnék, mennék). German uses würde + infinitive for most verbs, but the short forms (wäre, hätte, könnte, wüsste) for the most frequent ones.",
+      "Hungarian builds the conditional with one marker on the verb (-na/-ne, -ná/-né: tudnék, mennék). German uses würde + infinitive for most verbs, but the short forms (wäre, hätte, könnte, wüsste) for the most frequent ones.",
       "The Hungarian past conditional is the past form + volna (tudtam volna). German is hätte or wäre + participle, and you must choose the auxiliary as in the Perfekt: ich hätte gewusst, ich wäre gegangen.",
       "Hungarian uses the conditional in both clauses (Ha lenne időm, eljönnék), and so does German: Wenn ich Zeit hätte, würde ich kommen. Don't copy English, which has a simple past in the if-clause.",
       "mintha + conditional corresponds to als ob + Konjunktiv II: mintha beteg lenne = als ob er krank wäre.",
@@ -239,7 +239,7 @@ GT.NOTES = {
       "Modern Hungarian has almost no passive: it uses the third person plural (Megépítették a hidat) or a general subject. German uses the passive constantly in formal and written language, so you have to build it up deliberately.",
       "Where Hungarian has a third person plural without a subject (Itt nem dohányoznak), German uses the impersonal passive or man: Hier wird nicht geraucht.",
       "Hungarian van + -va/-ve (be van zárva) describes a state, like the German state passive: Es ist geschlossen. For the process, German needs werden: Die Tür wird geschlossen.",
-      "Hungarian által corresponds to von for the doer and durch for a means: az igazgató által = vom Direktor."
+      "Hungarian által covers both the doer and the means. German separates them: von for the doer (az igazgató által = vom Direktor), durch for a means or cause (durch einen Boten, durch den Sturm)."
     ]
   }
 };
