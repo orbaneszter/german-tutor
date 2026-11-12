@@ -7,7 +7,7 @@ GT.sets = GT.sets || {};
 GT.addSet = function (set) { GT.sets[set.thread ? "thread" + set.thread : String(set.unit)] = set; };
 
 // Exercise set files in data/. Add a file here when Claude Code writes a new unit.
-GT.BANK_FILES = ["unit01.js", "unit02.js", "unit03.js", "threadG.js"];
+GT.BANK_FILES = ["unit01.js", "unit02.js", "unit03.js", "unit04.js", "unit05.js", "threadG.js"];
 
 GT.NODES = {
   F1: "Tenses: Perfekt, Präteritum, Plusquamperfekt",
@@ -191,6 +191,55 @@ GT.NOTES = {
       "Hungarian has three-way endings (-ba, -ban, -ból: where to, where, where from). The German two-way prepositions cover the first two with one word and show the difference only through the case: in die Stadt (-ba), in der Stadt (-ban).",
       "Verb government rarely matches: gondol valamire = denken an + accusative; vár valakire = warten auf + accusative; fél valamitől = Angst haben vor + dative; érdeklődik valami iránt = sich interessieren für + accusative. Don't translate the Hungarian ending.",
       "Hungarian points ahead with arra, abban, attól (arra gondolok, hogy …). German does the same with da-compounds: Ich denke daran, dass …"
+    ]
+  },
+  "4": {
+    rules: [
+      "Present: most verbs use würde + infinitive. The most frequent verbs have their own forms: wäre, hätte, würde, könnte, müsste, dürfte, sollte, wollte, wüsste, käme, ginge, gäbe, bräuchte.",
+      "Past: there is only one form, hätte or wäre + past participle, with the same auxiliary as in the Perfekt: Ich hätte gefragt. Sie wäre gekommen.",
+      "Past with a modal verb: hätte + infinitive + modal infinitive: Du hättest fragen sollen. Das hätte nicht passieren dürfen.",
+      "Unreal conditions: Wenn ich Zeit hätte, würde ich kommen. Without wenn the verb comes first: Hätte ich Zeit, würde ich kommen.",
+      "Unreal wishes, with doch, nur or bloß: Wenn ich doch mehr Zeit hätte! Hätte ich das nur gewusst!",
+      "Unreal comparisons: als ob (or als wenn) + verb last, or als + verb directly after it: Er tut so, als ob er krank wäre. Er tut so, als wäre er krank.",
+      "Polite requests and advice: Könnten Sie mir helfen? Ich hätte gern … An deiner Stelle würde ich … Du solltest …",
+      "fast or beinahe + past Konjunktiv II: something nearly happened: Ich hätte fast den Zug verpasst.",
+      "In a subordinate clause with a double infinitive, hätte stands before both infinitives: …, dass er das nicht hätte tun dürfen."
+    ],
+    models: [
+      "Hätte ich das gewusst, wäre ich früher gekommen.",
+      "Wenn ich mehr Zeit hätte, würde ich öfter lesen.",
+      "Er tut so, als ob er nichts davon wüsste.",
+      "Du hättest mir das früher sagen sollen."
+    ],
+    hu: [
+      "Hungarian builds the conditional with one ending (-na, -ne: tudnék, mennék). German uses würde + infinitive for most verbs, but the short forms (wäre, hätte, könnte, wüsste) for the most frequent ones.",
+      "The Hungarian past conditional is the past form + volna (tudtam volna). German is hätte or wäre + participle, and you must choose the auxiliary as in the Perfekt: ich hätte gewusst, ich wäre gegangen.",
+      "Hungarian uses the conditional in both clauses (Ha lenne időm, eljönnék), and so does German: Wenn ich Zeit hätte, würde ich kommen. Don't copy English, which has a simple past in the if-clause.",
+      "mintha + conditional corresponds to als ob + Konjunktiv II: mintha beteg lenne = als ob er krank wäre.",
+      "Bárcsak … corresponds to Wenn … doch/nur, or to the wish with the verb first: Bárcsak tudtam volna! = Hätte ich das nur gewusst!"
+    ]
+  },
+  "5": {
+    rules: [
+      "Process passive (Vorgangspassiv): werden + past participle. Present wird gebaut, Präteritum wurde gebaut, Perfekt ist gebaut worden (worden, not geworden), Plusquamperfekt war gebaut worden.",
+      "State passive (Zustandspassiv): sein + past participle, for the result of an action: Das Geschäft ist geschlossen.",
+      "The doer takes von + dative (vom Chef); a means or cause takes durch + accusative (durch einen Boten, durch den Sturm).",
+      "With a modal verb: modal + participle + werden: Die Rechnung muss bezahlt werden. Past: musste bezahlt werden.",
+      "Only an accusative object can become the subject. A dative object stays dative: Man hilft ihm → Ihm wird geholfen.",
+      "Impersonal passive: verbs without an accusative object form a passive without a subject. es fills the first position only if nothing else does: Es wird hier viel gearbeitet. Hier wird viel gearbeitet.",
+      "Subordinate clause: participle + werden + conjugated verb: …, dass das Haus verkauft werden muss. With a double infinitive, hat or hätte comes first: …, dass der Fehler hätte vermieden werden können."
+    ],
+    models: [
+      "Das Haus wird gerade renoviert.",
+      "Der Vertrag ist gestern vom Chef unterschrieben worden.",
+      "Ihm wurde sofort geholfen.",
+      "Ich weiß, dass das hätte vermieden werden können."
+    ],
+    hu: [
+      "Modern Hungarian has almost no passive: it uses the third person plural (Megépítették a hidat) or a general subject. German uses the passive constantly in formal and written language, so you have to build it up deliberately.",
+      "Where Hungarian has a third person plural without a subject (Itt nem dohányoznak), German uses the impersonal passive or man: Hier wird nicht geraucht.",
+      "Hungarian van + -va/-ve (be van zárva) describes a state, like the German state passive: Es ist geschlossen. For the process, German needs werden: Die Tür wird geschlossen.",
+      "Hungarian által corresponds to von for the doer and durch for a means: az igazgató által = vom Direktor."
     ]
   }
 };
