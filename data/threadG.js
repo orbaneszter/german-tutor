@@ -4,7 +4,7 @@ GT.addSet(
  "thread": "G",
  "version": 1,
  "written": "2026-11-12",
- "reviewed": false,
+ "reviewed": true,
  "items": [
   {
    "id": "tG-001",
@@ -94,7 +94,7 @@ GT.addSet(
    "answers": [
     "die"
    ],
-   "explain": "die Situation. Nouns in -ion are feminine. Plural: die Situationen."
+   "explain": "die Situation. Nouns in -ion are almost always feminine (-tion and -sion always; but das Stadion, der Spion). Plural: die Situationen."
   },
   {
    "id": "tG-006",
@@ -130,7 +130,7 @@ GT.addSet(
    "answers": [
     "die"
    ],
-   "explain": "die Politik. Nouns in -ik are feminine. It has no plural in normal use."
+   "explain": "die Politik. Nouns in -ik are almost always feminine (but der Atlantik, das Mosaik). It has no plural in normal use."
   },
   {
    "id": "tG-008",
@@ -148,7 +148,7 @@ GT.addSet(
    "answers": [
     "die"
    ],
-   "explain": "die Bäckerei. Nouns in -ei are feminine. Plural: die Bäckereien."
+   "explain": "die Bäckerei. Nouns with the stressed suffix -ei are feminine (but das Ei, der Brei, where -ei is part of the stem). Plural: die Bäckereien."
   },
   {
    "id": "tG-009",
@@ -202,7 +202,7 @@ GT.addSet(
    "answers": [
     "das"
    ],
-   "explain": "das Zentrum. Nouns in -um are neuter. Plural: die Zentren."
+   "explain": "das Zentrum. Latin nouns in -um are neuter (but -tum can be masculine: der Irrtum, der Reichtum). Plural: die Zentren."
   },
   {
    "id": "tG-012",
@@ -220,7 +220,7 @@ GT.addSet(
    "answers": [
     "das"
    ],
-   "explain": "das Museum. Nouns in -um are neuter. Plural: die Museen."
+   "explain": "das Museum. Latin nouns in -um are neuter (but -tum can be masculine: der Irrtum, der Reichtum). Plural: die Museen."
   },
   {
    "id": "tG-013",
@@ -418,7 +418,7 @@ GT.addSet(
    "answers": [
     "das"
    ],
-   "explain": "das Gebäude. Nouns with Ge- … -e are neuter. Plural: die Gebäude."
+   "explain": "das Gebäude. Collective nouns with Ge- … -e are mostly neuter (das Gebirge, das Gemüse; but der Gedanke, die Geschichte). Plural: die Gebäude."
   },
   {
    "id": "tG-024",
@@ -472,7 +472,7 @@ GT.addSet(
    "answers": [
     "der"
    ],
-   "explain": "der Frühling. Nouns in -ling are masculine; so are all seasons. Plural: die Frühlinge."
+   "explain": "der Frühling. Nouns in -ling are masculine; so are the four seasons. Plural: die Frühlinge."
   },
   {
    "id": "tG-027",
@@ -508,7 +508,7 @@ GT.addSet(
    "answers": [
     "der"
    ],
-   "explain": "der Motor. Nouns in -or are masculine. Plural: die Motoren."
+   "explain": "der Motor. Latin nouns in -or are mostly masculine (but das Labor). Plural: die Motoren."
   },
   {
    "id": "tG-029",
@@ -526,7 +526,7 @@ GT.addSet(
    "answers": [
     "der"
    ],
-   "explain": "der Faktor. Nouns in -or are masculine. Plural: die Faktoren."
+   "explain": "der Faktor. Latin nouns in -or are mostly masculine (but das Labor). Plural: die Faktoren."
   },
   {
    "id": "tG-030",
@@ -580,7 +580,7 @@ GT.addSet(
    "answers": [
     "der"
    ],
-   "explain": "der Regen. Most weather words are masculine (der Regen, der Schnee, der Wind). It has no plural in normal use."
+   "explain": "der Regen. Most words for rain, snow and wind are masculine (der Regen, der Schnee, der Wind, der Nebel; but das Gewitter, die Wolke). It has no plural in normal use."
   },
   {
    "id": "tG-033",
@@ -652,7 +652,7 @@ GT.addSet(
    "answers": [
     "der"
    ],
-   "explain": "der Einfluss. Nouns made from a verb stem without an ending are mostly masculine (der Fluss, der Einfluss). Plural: die Einflüsse."
+   "explain": "der Einfluss. Nouns made from a verb stem without an ending are mostly masculine (einfließen → der Einfluss, like der Fluss). Plural: die Einflüsse."
   },
   {
    "id": "tG-037",
@@ -706,7 +706,7 @@ GT.addSet(
    "answers": [
     "das"
    ],
-   "explain": "das Angebot. No rule helps here: learn das Angebot. Plural: die Angebote."
+   "explain": "das Angebot. A trap: nouns made from a verb stem are mostly masculine, but it is das Angebot (like das Verbot, das Gebot). Plural: die Angebote."
   },
   {
    "id": "tG-040",
@@ -832,7 +832,7 @@ GT.addSet(
    "answers": [
     "die"
    ],
-   "explain": "die Antwort. No rule helps here: learn die Antwort. Plural: die Antworten."
+   "explain": "die Antwort. A trap: it is das Wort, but die Antwort. Plural: die Antworten."
   },
   {
    "id": "tG-047",
@@ -904,7 +904,7 @@ GT.addSet(
    "answers": [
     "das"
    ],
-   "explain": "das Beispiel. Compounds take the gender of their last part: das Spiel, das Beispiel. Plural: die Beispiele."
+   "explain": "das Beispiel. A memory aid: the same gender as das Spiel. Plural: die Beispiele."
   },
   {
    "id": "tG-051",
@@ -1043,7 +1043,7 @@ GT.addSet(
    "answers": [
     "einem guten"
    ],
-   "explain": "mit + dative, masculine: einem. After an article with an ending the adjective takes -en."
+   "explain": "mit + dative, masculine: einem. In the dative the adjective after an article always takes -en."
   },
   {
    "id": "tG-059",
@@ -1056,7 +1056,7 @@ GT.addSet(
    "answers": [
     "meiner neuen"
    ],
-   "explain": "mit + dative, feminine: meiner. After an article with an ending the adjective takes -en."
+   "explain": "mit + dative, feminine: meiner. In the dative the adjective after an article always takes -en."
   },
   {
    "id": "tG-060",
@@ -1065,11 +1065,11 @@ GT.addSet(
    "type": "L",
    "level": "B2",
    "cat": "G3",
-   "prompt": "bei ___ Wetter (das, schlecht)",
+   "prompt": "bei ___ Wetter (dieser, schlecht)",
    "answers": [
-    "dem schlechten"
+    "diesem schlechten"
    ],
-   "explain": "bei + dative, neuter: dem; the adjective takes -en."
+   "explain": "bei + dative, neuter: diesem; the adjective takes -en."
   },
   {
    "id": "tG-061",
@@ -1305,7 +1305,7 @@ GT.addSet(
    "answers": [
     "einen wichtigen"
    ],
-   "explain": "für + accusative, masculine: einen; the adjective takes -en."
+   "explain": "für + accusative, masculine: einen; the adjective takes -en. Kunde is an n-declension noun: einen Kunden."
   },
   {
    "id": "tG-079",
@@ -1587,7 +1587,7 @@ GT.addSet(
    "type": "L",
    "level": "B2",
    "cat": "G3",
-   "prompt": "trotz ___ Zweifel (groß)",
+   "prompt": "trotz ___ Fortschritte (groß)",
    "answers": [
     "großer"
    ],
