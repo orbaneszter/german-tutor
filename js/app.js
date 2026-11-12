@@ -13,6 +13,9 @@ const TIME_LIMIT = { L: 25, M: 20, O: 40, T: 60, S: 60, E: 45 };  // seconds per
 const SPRINT_LIMIT = { L: 15, M: 8 };       // seconds per item in the endings sprint
 const SPRINT_GOAL = { pct: 90, sec: 8 };    // plan v3: 90% right at under 8 seconds an item
 const CAT_NAMES = { G1: "Gender (der, die, das)", G2: "Choosing the case", G3: "Ending pattern" };
+// Error categories for writing and speaking feedback (plan v3, section 7).
+const ERR_CATS = { G1: "gender", G2: "case", G3: "ending pattern", W: "word order", V: "verb form, tense or mood", P: "preposition or government",
+  L: "word choice or collocation", R: "register or style", K: "connector or cohesion", O: "spelling or punctuation" };
 const REVIEW_MODES = ["mixed", "check", "warm"];     // the modes that count towards mastery
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -126,7 +129,7 @@ function copyText(text) {
   return ok ? Promise.resolve() : Promise.reject();
 }
 function copyAndTell(text, what) {
-  copyText(text).then(() => toast(`Copied${what ? " " + what : ""}. Paste it into your German C2 tutor project in Claude.`),
+  copyText(text).then(() => toast(`Copied${what ? " " + what : ""}. Paste it into your German tutor project in Claude.`),
     () => toast("Copy failed. Your browser blocked the clipboard."));
 }
 let toastTimer = null;
@@ -573,10 +576,12 @@ function startSession(mode, u) {
   } else if (mode === "sprint") {
     // 20 thread items; unseen, missed and stale ones are favoured, and so is the weakest category
     const acc = sprintCats(S.attempts.filter(a => a.m === "sprint").slice(-60));
+    const written = {};   // endings errors in the last five corrected tasks, by category
+    S.production.slice(-5).forEach(p => p.errors.forEach(e => { if (CAT_NAMES[e.cat]) written[e.cat] = (written[e.cat] || 0) + 1; }));
     items = weightedSample(threadItems("G"), it => {
       const l = lastResult(it.id), c = acc[it.cat];
       const base = !l ? 3 : 1 + (l.r !== "R" ? 4 : 0) + Math.min((Date.now() - l.t) / 864e5, 14) / 7;
-      return base * (c && c[1] >= 5 ? 2 - c[0] / c[1] : 1.5);
+      return base * (c && c[1] >= 5 ? 2 - c[0] / c[1] : 1.5) * (1 + Math.min(written[it.cat] || 0, 5) / 5);
     }, 20);
   } else if (mode === "check") {
     // spread 20 items evenly over the units so far
@@ -884,7 +889,7 @@ function renderWrite() {
           <b>${esc(t.title)}</b><br><span class="note">${KIND[t.kind]}${t.words ? ` · ~${t.words} words` : ""} · ${t.minutes} min${t.week === 2 ? " · week 2" : ""}${t.current && writeState.unit === seqPos().entry.u ? " · this week" : ""}${done ? " · done ✓" : ""}</span></button>`;
       }).join("")}</div>
     </div>
-    ${task ? taskEditor(task) : `<p class="muted">Choose a task. Thursday is production day.</p>`}
+    ${task ? taskEditor(task) : `<p class="muted">Choose a task. Writing is the main part of Session B.</p>`}
     ${history.length ? `<div class="card"><h2>Your corrected tasks</h2><div class="scroll"><table>
       <thead><tr><th>Date</th><th>Task</th><th>Overall</th><th>Errors</th></tr></thead><tbody>
       ${history.map(p => `<tr><td>${esc(p.date)}</td><td>${esc(unitName(p.unit))}: ${esc(p.title)}</td><td>${p.levels && p.levels.overall ? `<span class="tag t-acc">${esc(p.levels.overall)}</span>` : "—"}</td>
@@ -911,22 +916,30 @@ function taskEditor(task) {
     </div>
     <label for="essay">${task.kind === "speak" ? "Transcript of your recording" : "Your text"}</label>
     <textarea id="essay" class="essay" spellcheck="false" placeholder="${task.kind === "speak" ? "Type or paste the transcript of your recording" : "Schreiben Sie hier … (no spell-checker, no dictionary)"}">${esc(d.text)}</textarea>
-    <p class="note">Your draft is saved as you type. When you're done, copy the correction prompt into your German C2 tutor project in Claude, then paste the whole reply below.</p>
-    <div class="row"><button id="copyK" class="primary">Copy for Claude</button></div>
-    <label for="fb">Claude's reply</label>
+    <p class="note">Your draft is saved as you type. Feedback comes in two rounds from your German tutor project in Claude.</p>
+    <h3>Round 1: find your own errors</h3>
+    <p>Claude marks where the errors are and what kind they are, without correcting them. Fix as many as you can in the box below.</p>
+    <div class="row"><button id="copyM" class="primary">1. Copy for Claude: mark my errors</button><button id="startRev" class="small">Copy my text into the box below</button></div>
+    <label for="rev">Your corrected version</label>
+    <textarea id="rev" class="essay" style="min-height:160px" spellcheck="false" placeholder="Correct the places Claude marked. Leave this empty to skip round 1.">${esc(d.rev || "")}</textarea>
+    <h3>Round 2: full correction</h3>
+    <div class="row"><button id="copyK" class="primary">2. Copy for Claude: full correction</button></div>
+    <label for="fb">Claude's reply to round 2</label>
     <textarea id="fb" placeholder="Paste Claude's whole reply here, including the JSON block at the end"></textarea>
     <div class="row"><button id="readFb">Read feedback</button></div>
     ${p ? feedbackPreview(p) : ""}
   </div>`;
 }
 
+function catTag(c) { return c ? `<span class="tag ${/^G/.test(c) ? "t-bad" : c === "W" ? "t-mid" : ""}" title="${esc(ERR_CATS[c] || "")}">${esc(c)}</span> <span class="note">${esc(ERR_CATS[c] || "")}</span>` : ""; }
+
 function feedbackPreview(p) {
   const L = p.levels || {};
   return `<h3>Feedback found</h3>
     <p>${["task", "coherence", "vocabulary", "grammar"].map(k => `${k}: <span class="tag t-acc">${esc(L[k] || "?")}</span>`).join(" ")} · overall <span class="tag t-good">${esc(L.overall || "?")}</span></p>
-    ${p.errors.length ? `<div class="scroll"><table><thead><tr><th></th><th>Original</th><th>Correction</th><th>Node</th><th>Rule</th></tr></thead><tbody>
-      ${p.errors.map((e, k) => `<tr><td><input type="checkbox" data-e="${k}" checked aria-label="keep error ${k + 1}"></td><td>${esc(e.original)}</td><td>${esc(e.correction)}</td><td>${esc(e.unit ? unitName(e.unit) + " " : "")}${esc(e.node)}</td><td>${esc(e.rule)}</td></tr>`).join("")}
-    </tbody></table></div><p class="note">Untick any error you don't want as an Anki card.</p>` : `<p>No errors listed.</p>`}
+    ${p.errors.length ? `<div class="scroll"><table><thead><tr><th></th><th>Original</th><th>Correction</th><th>Kind</th><th>Node</th><th>Rule</th></tr></thead><tbody>
+      ${p.errors.map((e, k) => `<tr><td><input type="checkbox" data-e="${k}" checked aria-label="keep error ${k + 1}"></td><td>${esc(e.original)}</td><td>${esc(e.correction)}${e.fixed ? ` <span class="tag t-good">fixed by you</span>` : ""}</td><td>${catTag(e.cat)}</td><td>${esc(e.unit ? unitName(e.unit) + " " : "")}${esc(e.node)}</td><td>${esc(e.rule)}</td></tr>`).join("")}
+    </tbody></table></div><p class="note">Untick any error you don't want as an Anki card. Errors you fixed yourself in round 1 get a low-priority card.</p>` : `<p>No errors listed.</p>`}
     ${p.priorities.length ? `<p><b>Priorities:</b></p><ul class="list">${p.priorities.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
     <div class="row"><button id="saveFb" class="primary">Save to error log and Anki cards</button></div>`;
 }
@@ -935,12 +948,24 @@ function bindEditor(task) {
   const ta = $("#essay");
   const upd = () => { $("#wCount").textContent = `${wordCount(ta.value)} words${task.words ? " / ~" + task.words : ""}`; };
   upd();
-  ta.oninput = () => { S.drafts[task.id] = { text: ta.value, t: Date.now(), started: (S.drafts[task.id] || {}).started || Date.now() }; upd(); saveSoon(); };
+  const rev = $("#rev");
+  const keep = () => { const o = S.drafts[task.id] || {}; S.drafts[task.id] = { text: ta.value, rev: rev.value, t: Date.now(), started: o.started || Date.now() }; saveSoon(); };
+  ta.oninput = () => { keep(); upd(); };
+  rev.oninput = keep;
   $("#timerBtn").onclick = () => startWriteTimer(task);
   if (writeState.timer) tickWrite();
+  $("#copyM").onclick = () => {
+    if (!ta.value.trim()) { toast("Write your text first."); return; }
+    if (!rev.value.trim()) { rev.value = ta.value; keep(); }
+    copyAndTell(markPrompt(task, ta.value), "the round 1 prompt");
+  };
+  $("#startRev").onclick = () => {
+    if (rev.value.trim() && rev.value !== ta.value && !confirm("Replace your corrected version with the original text?")) return;
+    rev.value = ta.value; keep();
+  };
   $("#copyK").onclick = () => {
     if (!ta.value.trim()) { toast("Write your text first."); return; }
-    copyAndTell(korrekturPrompt(task, ta.value), "the correction prompt");
+    copyAndTell(korrekturPrompt(task, ta.value, rev.value), "the round 2 prompt");
   };
   $("#readFb").onclick = () => {
     const data = extractJson($("#fb").value || "");
@@ -949,6 +974,7 @@ function bindEditor(task) {
     const fbText = $("#fb").value;
     renderWrite();
     $("#fb").value = fbText;
+    const save = $("#saveFb"); if (save) save.scrollIntoView({ block: "center" });
   };
   if ($("#saveFb")) $("#saveFb").onclick = () => saveFeedback(task);
 }
@@ -959,6 +985,8 @@ function normaliseFeedback(d) {
     original: String(e.original || ""), correction: String(e.correction || ""),
     unit: e.unit === undefined || e.unit === null ? "" : String(e.unit).replace(/^0+(?=\d)/, ""),
     node: /^(N\d{2}|F\d)$/i.test(String(e.node || "").trim()) ? String(e.node).trim().toUpperCase() : "",
+    cat: ERR_CATS[String(e.cat || "").trim().toUpperCase()] ? String(e.cat).trim().toUpperCase() : "",
+    fixed: e.fixed === true,
     rule: String(e.rule || ""), front: String(e.front || e.original || ""), back: String(e.back || e.correction || "")
   })).filter(e => e.original || e.correction);
   return {
@@ -973,24 +1001,54 @@ function saveFeedback(task) {
   const errors = p.errors.filter((e, k) => keep.includes(k));
   const id = "p" + Date.now(), date = localDate();
   const draft = S.drafts[task.id] || {};
-  S.production.push({ id, taskId: task.id, unit: writeState.unit, title: task.title, kind: task.kind, date, text, words: wordCount(text),
+  const revised = $("#rev").value.trim();
+  S.production.push({ id, taskId: task.id, unit: writeState.unit, title: task.title, kind: task.kind, date, text, rev: revised && revised !== text.trim() ? revised : "", words: wordCount(text),
     minutes: draft.started ? Math.round((Date.now() - draft.started) / 60000) : null, levels: p.levels, errors, priorities: p.priorities });
   errors.forEach((e, k) => {
-    S.errorLog.push({ date, unit: e.unit || writeState.unit, node: e.node, error: e.original, correction: e.correction, rule: e.rule, task: task.title, src: "production" });
+    S.errorLog.push({ date, unit: e.unit || writeState.unit, node: e.node, cat: e.cat, fixed: e.fixed, error: e.original, correction: e.correction, rule: e.rule, task: task.title, src: "production" });
     const back = e.back + (e.rule ? `\n${e.rule}` : "");
-    addCard(`p:${id}:${k}`, e.front, back, `unit::${unitTag(e.unit || writeState.unit)}${e.node ? " node::" + e.node : ""} type::error`);
+    addCard(`p:${id}:${k}`, e.front, back, `unit::${unitTag(e.unit || writeState.unit)}${e.node ? " node::" + e.node : ""} type::error${e.cat ? " cat::" + e.cat : ""}${e.fixed ? " prio::low" : ""}`);
   });
   delete S.drafts[task.id]; forget("dr:" + task.id);
   writeState.pending = null; writeState.timer = null;
   save(); renderWrite();
-  toast(`Saved: ${errors.length} errors in the error log and ${errors.length} new Anki cards.`);
+  const own = errors.filter(e => e.fixed).length;
+  toast(`Saved: ${errors.length} errors in the error log and as Anki cards${own ? `. You fixed ${own} of them yourself` : ""}.`);
 }
 
 function nodeListText() {
   return GT.UNITS.filter(u => u.nodes.length).map(u => `${u.id}: ${u.nodes.map(n => `${n} ${GT.NODES[n]}`).join("; ")}`).join("\n");
 }
 
-function korrekturPrompt(task, text) {
+function catListText() { return Object.entries(ERR_CATS).map(([k, v]) => `${k} ${v}`).join(" · "); }
+function taskText(task) {
+  return `Task (${KIND[task.kind]}${task.words ? `, about ${task.words} words` : ""}, ${task.minutes} minutes): ${task.title}
+${task.prompt}
+Focus: ${task.focus}`;
+}
+
+// Round 1: Claude marks where the errors are and their category, without correcting them.
+function markPrompt(task, text) {
+  return `MARKIEREN
+
+Round 1 of 2. Mark my errors, but do NOT correct them: I will try to fix them myself first.
+
+${taskText(task)}
+
+My ${task.kind === "speak" ? "transcript" : "text"}:
+"""
+${text.trim()}
+"""
+
+Return my text unchanged, with every error wrapped like this: [[wrong part]](1:G3). The number counts the errors; the code is the error category:
+${catListText()}
+Mark a missing word as [[ ]] at the place where it belongs.${task.kind === "speak" ? " This is a transcript of speech: don't mark features of normal spoken German." : ""}
+Give no corrections, no hints beyond the category, no ratings and no explanations. After the text, add one line with the number of errors per category.`;
+}
+
+function korrekturPrompt(task, text, revised) {
+  revised = (revised || "").trim();
+  const twoRounds = revised && revised !== text.trim();
   const unit = UNIT(writeState.unit);
   const level = S.settings.track ? GT.TRACKS[S.settings.track].level : "B2";
   const d = S.drafts[task.id] || {};
@@ -998,7 +1056,7 @@ function korrekturPrompt(task, text) {
   const tpl = `{
   "levels": {"task": "C1", "coherence": "B2", "vocabulary": "C1", "grammar": "B2", "overall": "B2"},
   "errors": [
-    {"original": "the wrong phrase", "correction": "the corrected phrase", "unit": 3, "node": "N06",
+    {"original": "the wrong phrase", "correction": "the corrected phrase", "cat": "P", "fixed": false, "unit": 3, "node": "N06",
      "rule": "rule in at most 12 words", "front": "my whole sentence with the wrong part in [[double brackets]]",
      "back": "the corrected whole sentence"}
   ],
@@ -1006,25 +1064,30 @@ function korrekturPrompt(task, text) {
 }`;
   return `KORREKTUR
 
-I'm preparing for the Goethe-Zertifikat C2: GDS. My starting level: ${level}. Current unit: ${unit.id} (${unit.name}), grammar nodes: ${unit.nodes.join(", ") || "none"}.
+${twoRounds ? "Round 2 of 2. " : ""}My goal is a steady C1 by June 2027, then the Goethe-Zertifikat C2: GDS. My starting level: ${level}. My first language is Hungarian. Current unit: ${unit.id} (${unit.name}), grammar nodes: ${unit.nodes.join(", ") || "none"}.
 
-Task (${KIND[task.kind]}${task.words ? `, about ${task.words} words` : ""}, ${task.minutes} minutes): ${task.title}
-${task.prompt}
-Focus: ${task.focus}
+${taskText(task)}
 
 My ${task.kind === "speak" ? "transcript" : "text"} (${wordCount(text)} words${mins ? `, written in about ${mins} minutes` : ""}):
 """
 ${text.trim()}
 """
+${twoRounds ? `
+My corrected version after round 1 (I fixed what I could by myself):
+"""
+${revised}
+"""
 
+Rate and correct the ORIGINAL text. For each of its errors, set "fixed" to true if my corrected version repairs it correctly, otherwise false. If my corrected version introduces a new error, list it too, with "fixed": false.
+` : ""}
 1. Rate task fulfilment, coherence and cohesion, vocabulary, and grammar, each with a CEFR level (B1–C2) and one sentence of evidence; then one overall level. Be strict: rate what is reliably shown, not what is attempted.${task.kind === "speak" ? " This is a transcript of speech: judge it as spoken German." : ""}
-2. A table of every error: original | correction | unit | node | rule (short).
+2. A table of every error: original | correction | category | unit | node | rule (short). Categories: ${catListText()}.
 3. My 3 priorities for next week.
 4. At the very end, one JSON code block for my tutor app, in exactly this shape (valid JSON, no comments, one entry per error from the table):
 \`\`\`json
 ${tpl}
 \`\`\`
-Use the unit numbers and node IDs from the list below; use "" for the node if none fits.
+"cat" is one category code from the list above. "fixed" is ${twoRounds ? "as described above" : "always false, because there was no round 1"}. Use the unit numbers and node IDs from the list below; use "" for the node if none fits.
 
 If you are not sure that something is correct German, say so. Never invent a rule.
 
@@ -1097,6 +1160,13 @@ function renderProgress() {
   const totalR = S.attempts.filter(a => a.r === "R").length;
 
   const sprints = S.sprints.slice(-5).reverse();
+  const kindMap = {}, last3ids = new Set(S.production.slice(-3).map(p => p.id));
+  S.production.forEach(p => p.errors.forEach(e => {
+    if (!e.cat) return;
+    const k = kindMap[e.cat] = kindMap[e.cat] || { all: 0, last3: 0, fixed: 0 };
+    k.all++; if (last3ids.has(p.id)) k.last3++; if (e.fixed) k.fixed++;
+  }));
+  const kinds = Object.entries(kindMap).sort((a, b) => b[1].last3 - a[1].last3 || b[1].all - a[1].all);
   const catAll = sprintCats(S.attempts.filter(a => a.m === "sprint").slice(-100));
   view().innerHTML = `
     <div class="card">
@@ -1115,10 +1185,18 @@ function renderProgress() {
       <div class="card"><h2>Error log</h2><p><span class="stat">${S.errorLog.length}</span> entries</p></div>
     </div>
 
+    ${kinds.length ? `<div class="card">
+      <h2>Your errors by kind</h2>
+      <p class="note">From your corrected writing and speaking tasks. "Fixed by you" counts the errors you repaired in round 1.</p>
+      <div class="scroll"><table><thead><tr><th>Kind</th><th>All tasks</th><th>Last three tasks</th><th>Fixed by you</th></tr></thead><tbody>
+        ${kinds.map(([c, n]) => `<tr><td>${catTag(c)}</td><td>${n.all}</td><td>${n.last3}</td><td>${n.fixed} <span class="note">(${pct(n.fixed, n.all)}%)</span></td></tr>`).join("")}
+      </tbody></table></div>
+    </div>` : ""}
+
     <div class="card">
       <h2>Review this week</h2>
       ${focus.length ? `<ul class="list">${focus.map(s => `<li><b>${s.n}</b> ${esc(GT.NODES[s.n])} <span class="muted">(${unitName(unitOf(s.n).id)}${s.prodErrors ? ` · ${s.prodErrors} error${s.prodErrors === 1 ? "" : "s"} in your last three tasks` : ""}${s.weekScores.length ? ` · review ${s.weekScores[0]}%` : s.drill !== null ? ` · drills ${s.drill}%` : ""})</span></li>`).join("")}</ul>
-        <p class="note">Add these to Friday's mixed review, and ask the Claude project for FEHLERSUCHE on their units.</p>` : `<p class="muted">Nothing to flag yet. Do some drills and a writing task first.</p>`}
+        <p class="note">Drill these units again; their items also come up more often in the warm-up.</p>` : `<p class="muted">Nothing to flag yet. Do some drills and a writing task first.</p>`}
     </div>
 
     <div class="card">
@@ -1143,7 +1221,7 @@ function renderProgress() {
       <div class="row spread"><h2 style="margin:0">Error log</h2>
         <select id="logF"><option value="">All units</option>${[...new Set(S.errorLog.map(e => e.unit))].sort((a, b) => ORDER.indexOf(a) - ORDER.indexOf(b)).map(u => `<option value="${esc(u)}" ${u === logFilter ? "selected" : ""}>${esc(unitName(u))}</option>`).join("")}</select></div>
       ${log.length ? `<div class="scroll"><table><thead><tr><th>Date</th><th>Unit</th><th>Error</th><th>Correction</th><th>Task</th></tr></thead><tbody>
-        ${log.slice(0, 100).map(e => `<tr><td>${esc(e.date)}</td><td>${esc(e.unit)}${e.node ? ` <span class="note">${esc(e.node)}</span>` : ""}</td><td>${esc(e.error)}</td><td><b>${esc(e.correction)}</b>${e.rule ? `<br><span class="note">${esc(e.rule)}</span>` : ""}</td><td class="note">${esc(e.task)}</td></tr>`).join("")}
+        ${log.slice(0, 100).map(e => `<tr><td>${esc(e.date)}</td><td>${esc(e.unit)}${e.node ? ` <span class="note">${esc(e.node)}</span>` : ""}</td><td>${e.cat ? `<span class="tag" title="${esc(ERR_CATS[e.cat] || "")}">${esc(e.cat)}</span> ` : ""}${esc(e.error)}</td><td><b>${esc(e.correction)}</b>${e.rule ? `<br><span class="note">${esc(e.rule)}</span>` : ""}</td><td class="note">${esc(e.task)}</td></tr>`).join("")}
       </tbody></table></div>${log.length > 100 ? `<p class="note">Showing the latest 100 of ${log.length}.</p>` : ""}` : `<p class="muted">No entries yet.</p>`}
       <div class="row" style="margin-top:10px">
         <label class="btn" for="csvIn" style="margin:0;font-weight:400">Import error-log.csv</label><input type="file" id="csvIn" accept=".csv,.txt" class="hidden">
@@ -1155,7 +1233,7 @@ function renderProgress() {
   $("#logF").onchange = e => { logFilter = e.target.value; renderProgress(); };
   $("#csvIn").onchange = e => importErrorCsv(e.target);
   $("#csvOut").onclick = () => download(`error-log-${localDate()}.csv`,
-    "date;unit;error;correction;task;node\n" + S.errorLog.map(e => [e.date, e.unit, e.error, e.correction, e.task, e.node].map(csvField).join(";")).join("\n") + "\n", "text/csv");
+    "date;unit;error;correction;task;node;category\n" + S.errorLog.map(e => [e.date, e.unit, e.error, e.correction, e.task, e.node, e.cat || ""].map(csvField).join(";")).join("\n") + "\n", "text/csv");
 }
 
 function importErrorCsv(input) {
