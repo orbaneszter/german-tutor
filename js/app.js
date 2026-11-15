@@ -26,7 +26,7 @@ const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", 
 function fresh() {
   return {
     v: 1, created: new Date().toISOString(),
-    settings: { track: "J", unit: "1", unitWeek: 1, startDate: "2026-11-16", examDate: "" },
+    settings: { track: "J", unit: "1", unitWeek: 1, startDate: "2026-11-16", examDate: "", cardCap: 70 },
     settingsT: 0,      // when the settings last changed (the newer side wins in sync)
     placement: null,
     attempts: [],      // { id, u, n, t, r: R|W|U, m: mode, a?: answer }
@@ -36,7 +36,7 @@ function fresh() {
     drafts: {},        // task id → { text, t }
     production: [],    // finished production tasks with Claude's feedback
     errorLog: [],      // { date, unit, node, error, correction, rule, task, src }
-    cards: [],         // { k, front, back, tags, t, exported }
+    cards: [],         // { k, front, back, tags, t, exported, x?: time of export }
     checkpoints: [],   // { t, right, n, units: { u: [right, n] } }
     sprints: [],       // { t, right, n, sec, cats: { G1: [right, n] } } endings sprints
     recons: [],        // { t, id, text, ok, n } reconstructions (thread W): points ticked out of n
@@ -240,11 +240,39 @@ function addCard(k, front, back, tags) {
   S.cards.push({ k, front, back, tags, t: Date.now(), exported: false });
   return true;
 }
+// Card fronts are whole sentences with a gap (plan v3): say the missing part, then turn the card.
+const PUNCT = /[.,;:!?]+$/;
+// Word order: one blank per word, and the words in alphabetical order below.
+function orderFront(pre, words, post, tail = "") {
+  const sorted = words.slice().sort((a, b) => a.localeCompare(b, "de"));
+  return `Word order: say the sentence, then turn the card.\n${[pre, words.map(() => "___").join(" ") + tail, post].filter(Boolean).join(" ")}\n(${sorted.join(" · ")})`;
+}
+// Find-the-error items: the corrected sentence with the repaired part as the gap.
+function errorFront(it) {
+  const bad = it.prompt.trim().split(/\s+/), good = it.answers[0].trim().split(/\s+/);
+  let a = 0, z = 0;
+  while (a < bad.length && a < good.length && bad[a] === good[a]) a++;
+  while (z < bad.length - a && z < good.length - a && bad[bad.length - 1 - z] === good[good.length - 1 - z]) z++;
+  const wrong = bad.slice(a, bad.length - z), right = good.slice(a, good.length - z);
+  if (!wrong.length || !right.length) return null;   // a word was only added or removed: no gap to fill
+  const tail = (right[right.length - 1].match(PUNCT) || [""])[0];
+  const pre = good.slice(0, a).join(" "), post = good.slice(good.length - z).join(" ");
+  const bare = l => l.map(w => w.replace(/[.,;:!?]/g, "")).filter(Boolean);
+  const bag = l => bare(l).map(w => w.toLowerCase()).sort().join(" ");
+  if (right.length > 1 && bag(wrong) === bag(right)) return orderFront(pre, bare(right), post, tail);
+  return `${pre} ___${tail} ${post}`.trim() + `\n(falsch: ${wrong.join(" ").replace(PUNCT, "")})`;
+}
+// Writing errors: Claude marks the wrong part as [[…]]; the card shows a gap there.
+function gapFront(front) {
+  const m = String(front).match(/\[\[(.+?)\]\]/);
+  if (!m) return front;
+  return front.replace(m[0], "___").replace(/\[\[|\]\]/g, "") + `\n(falsch: ${m[1]})`;
+}
 function drillCard(it) {
-  let front = it.instruction ? it.instruction + "\n" : "";
-  if (it.type === "O") front += `${it.prompt}\n${it.start ? it.start + " … " : ""}${shuffle(it.words).join(" / ")}`;
+  let front = it.instruction && it.type !== "O" ? it.instruction + "\n" : "";
+  if (it.type === "O") front += orderFront(it.start || "", it.words, "", (it.answers[0].match(PUNCT) || ["."])[0]);
   else if (it.type === "M") front += `${it.prompt}\n(${it.options.join(" | ")})`;
-  else if (it.type === "E") front += `Find the error: ${it.prompt}`;
+  else if (it.type === "E") front = errorFront(it) || `Find the error: ${it.prompt}`;
   else front += it.prompt;
   const back = `${solutionText(it)}\n${it.explain}`;
   addCard("d:" + it.id, front, back, `unit::${unitTag(it.unit)} node::${it.node} type::drill${it.thread ? " thread::" + it.thread : ""}`);
@@ -253,13 +281,24 @@ function ankiFile(cards) {
   const head = "#separator:Semicolon\n#html:false\n#notetype:Basic\n#deck:German C2\n#tags column:3\n";
   return head + cards.map(c => [c.front, c.back, c.tags].map(f => `"${String(f).replace(/"/g, '""')}"`).join(";")).join("\n") + "\n";
 }
-function exportCards(all) {
-  const list = all ? S.cards : S.cards.filter(c => !c.exported);
-  if (!list.length) { toast("No new cards to export."); return; }
-  download(`anki-german-c2-${localDate()}${all ? "-all" : ""}.txt`, ankiFile(list));
-  list.forEach(c => { c.exported = true; }); save(); render();
+// The cap (plan v3): Anki shows 10 new cards a day, so the app hands over at most a week's worth in any
+// seven days. Waiting cards go out in order of use: errors from your writing, then missed drill items,
+// then errors you repaired yourself.
+const cardPrio = c => /prio::low/.test(c.tags) ? 2 : /type::error/.test(c.tags) ? 0 : 1;
+const cardQueue = () => S.cards.filter(c => !c.exported).sort((a, b) => cardPrio(a) - cardPrio(b) || a.t - b.t);
+function cardRoom() {
+  const cap = S.settings.cardCap ?? 70;
+  return Math.max(0, cap - S.cards.filter(c => c.exported && c.x && Date.now() - c.x < 7 * DAY).length);
 }
-const newCards = () => S.cards.filter(c => !c.exported).length;
+const newCards = () => Math.min(cardQueue().length, cardRoom());
+const heldCards = () => cardQueue().length - newCards();
+const heldNote = () => heldCards() ? `${heldCards()} more wait${heldCards() === 1 ? "s" : ""}: the limit is ${S.settings.cardCap ?? 70} new cards in seven days.` : "";
+function exportCards(all) {
+  const list = all ? S.cards.slice() : cardQueue().slice(0, cardRoom());
+  if (!list.length) { toast(heldCards() ? "This week's limit of new cards is reached. The others wait." : "No new cards to export."); return; }
+  download(`anki-german-c2-${localDate()}${all ? "-all" : ""}.txt`, ankiFile(list));
+  list.forEach(c => { if (!c.exported) c.x = Date.now(); c.exported = true; }); save(); render();
+}
 
 // ---------- Answer checking ----------
 
@@ -468,7 +507,7 @@ function renderToday() {
     </div>
 
     <div class="grid2">
-      <div class="card"><h2>Anki</h2><p><span class="stat">${nCards}</span> new card${nCards === 1 ? "" : "s"} to import</p>
+      <div class="card"><h2>Anki</h2><p><span class="stat">${nCards}</span> new card${nCards === 1 ? "" : "s"} to import${heldNote() ? ` <span class="note">${esc(heldNote())}</span>` : ""}</p>
         <button id="ankiBtn" ${nCards ? "" : "disabled"}>Download for Anki</button></div>
       <div class="card"><h2>Unsure answers</h2><p><span class="stat">${nUnsure}</span> waiting for Claude's verdict</p>
         <button id="unsureBtn" ${nUnsure ? "" : "disabled"}>Check them with Claude</button></div>
@@ -798,7 +837,7 @@ function renderSummary() {
         ${Object.entries(session.mode === "check" ? units : nodes).map(([k, [r, n]]) => `<tr><td>${esc(session.mode === "check" ? unitName(k) + ": " + UNIT(k).name : k + " " + GT.NODES[k])}</td><td>${r}/${n} <span class="tag ${pct(r, n) >= 85 ? "t-good" : pct(r, n) >= 60 ? "t-mid" : "t-bad"}">${pct(r, n)}%</span></td></tr>`).join("")}
       </tbody></table></div>
       ${missed.length ? `<h3>Not right this time</h3><ul class="list">${missed.map(a => { const it = ITEMS[a.id]; return `<li>${a.r === "U" ? `<span class="tag t-mid">unsure</span> ` : ""}${esc(solutionText(it))}${a.a ? ` <span class="muted">(you: ${esc(a.a)})</span>` : ""}</li>`; }).join("")}</ul>
-        <p class="note">Missed items are queued as Anki cards (${newCards()} new). Unsure ones wait for Claude's verdict.</p>` : `<p>Everything right.</p>`}
+        <p class="note">Missed items are queued as Anki cards (${newCards()} new${heldCards() ? `, ${heldCards()} waiting` : ""}). Unsure ones wait for Claude's verdict.</p>` : `<p>Everything right.</p>`}
       <div class="row">
         ${missed.length ? `<button id="againBtn" class="primary">Practise the missed ones again</button>` : ""}
         <button id="ankiBtn" ${newCards() ? "" : "disabled"}>Download Anki cards</button>
@@ -1038,7 +1077,7 @@ function saveFeedback(task) {
   errors.forEach((e, k) => {
     S.errorLog.push({ date, unit: e.unit || writeState.unit, node: e.node, cat: e.cat, fixed: e.fixed, error: e.original, correction: e.correction, rule: e.rule, task: task.title, src: "production" });
     const back = e.back + (e.rule ? `\n${e.rule}` : "");
-    addCard(`p:${id}:${k}`, e.front, back, `unit::${unitTag(e.unit || writeState.unit)}${e.node ? " node::" + e.node : ""} type::error${e.cat ? " cat::" + e.cat : ""}${e.fixed ? " prio::low" : ""}`);
+    addCard(`p:${id}:${k}`, gapFront(e.front), back, `unit::${unitTag(e.unit || writeState.unit)}${e.node ? " node::" + e.node : ""} type::error${e.cat ? " cat::" + e.cat : ""}${e.fixed ? " prio::low" : ""}`);
   });
   delete S.drafts[task.id]; forget("dr:" + task.id);
   writeState.pending = null; writeState.timer = null;
@@ -1509,7 +1548,11 @@ function renderSetup() {
 
     <div class="card">
       <h2>Anki</h2>
-      <p>${newCards()} new of ${S.cards.length} cards. The file has headers that tell Anki the deck (<i>German C2</i>), note type (Basic) and tags column: in Anki choose <b>File → Import</b>, pick the file, check the preview and import.</p>
+      <p>${newCards()} new of ${S.cards.length} cards. ${esc(heldNote())}</p>
+      <label for="cardCap">Most new cards in seven days</label>
+      <input type="number" id="cardCap" min="0" max="500" step="10" value="${S.settings.cardCap ?? 70}" style="width:6em">
+      <p class="note">Anki shows you 10 new cards a day, so more than 70 a week only builds a queue. Errors from your writing go first, then missed drill items, then errors you repaired yourself. Fronts are whole sentences with a gap.</p>
+      <p>The file has headers that tell Anki the deck (<i>German C2</i>), note type (Basic) and tags column: in Anki choose <b>File → Import</b>, pick the file, check the preview and import.</p>
       <div class="row"><button id="ankiNew" class="primary" ${newCards() ? "" : "disabled"}>Download new cards</button><button id="ankiAll" ${S.cards.length ? "" : "disabled"}>Download all cards again</button></div>
     </div>
 
@@ -1558,6 +1601,7 @@ function renderSetup() {
   $("#cur").onchange = e => { S.settings.unit = e.target.value; S.settings.unitWeek = 1; save(); renderSetup(); };
   $("#wk").onchange = e => { S.settings.unitWeek = Math.min(Number(e.target.value), seqPos().entry.weeks); save(); renderSetup(); };
   $("#ankiNew").onclick = () => exportCards(false);
+  $("#cardCap").onchange = e => { S.settings.cardCap = Math.min(500, Math.max(0, Math.round(Number(e.target.value) || 0))); save(); render(); };
   $("#ankiAll").onclick = () => exportCards(true);
   $("#bankOut").onclick = () => download(`bank-feedback-${localDate()}.json`, JSON.stringify({
     exported: new Date().toISOString(),
@@ -1686,7 +1730,7 @@ function mergeStates(a, b) {
 
   m.production = union(a.production, b.production, x => x.id).sort(by(x => x.id));
   m.errorLog = union(a.errorLog, b.errorLog, x => JSON.stringify(x)).sort(by(x => (x.date || "") + JSON.stringify(x)));
-  m.cards = union(a.cards, b.cards, x => x.k, (o, x) => Object.assign({}, o, { exported: o.exported || x.exported, t: Math.min(o.t, x.t) }))
+  m.cards = union(a.cards, b.cards, x => x.k, (o, x) => Object.assign({}, o, { exported: o.exported || x.exported, t: Math.min(o.t, x.t) }, o.x || x.x ? { x: Math.max(o.x || 0, x.x || 0) } : {}))
     .filter(c => c.exported || !((gone["c:" + c.k] || 0) > c.t))
     .sort((x, y) => x.t - y.t || (x.k < y.k ? -1 : x.k > y.k ? 1 : 0));
   m.checkpoints = union(a.checkpoints, b.checkpoints, x => x.t).sort(by(x => x.t));
