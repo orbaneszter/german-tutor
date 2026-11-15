@@ -7,7 +7,7 @@ GT.sets = GT.sets || {};
 GT.addSet = function (set) { GT.sets[set.thread ? "thread" + set.thread : String(set.unit)] = set; };
 
 // Exercise set files in data/. Add a file here when Claude Code writes a new unit.
-GT.BANK_FILES = ["unit01.js", "unit02.js", "unit03.js", "unit04.js", "unit05.js", "threadG.js", "threadW.js"];
+GT.BANK_FILES = ["unit01.js", "unit02.js", "unit03.js", "unit04.js", "unit05.js", "unit06.js", "threadG.js", "threadW.js"];
 
 GT.NODES = {
   F1: "Tenses: Perfekt, Präteritum, Plusquamperfekt",
@@ -240,6 +240,33 @@ GT.NOTES = {
       "Where Hungarian has a third person plural without a subject (Itt nem dohányoznak), German uses the impersonal passive or man: Hier wird nicht geraucht.",
       "Hungarian van + -va/-ve (be van zárva) describes a state, like the German state passive: Es ist geschlossen. For the process, German needs werden: Die Tür wird geschlossen.",
       "Hungarian által covers both the doer and the means. German separates them: von for the doer (az igazgató által = vom Direktor), durch for a means or cause (durch einen Boten, durch den Sturm)."
+    ]
+  },
+  "6": {
+    rules: [
+      "A relative pronoun takes its gender and number from the noun it refers to, and its case from its job inside the relative clause: der Film, den ich gesehen habe (masculine; accusative because of sehen).",
+      "The forms are those of the definite article, except the dative plural denen and the genitive: dessen (masculine and neuter), deren (feminine and plural).",
+      "dessen and deren (whose) follow the owner, not the thing owned, and never change: die Frau, deren Hund …; der Mann, dessen Tochter … No article and no possessive comes after them.",
+      "A preposition always stands in front of the relative pronoun and decides its case: der Kollege, mit dem ich arbeite; das Thema, über das wir sprechen.",
+      "was follows alles, etwas, nichts, vieles, das, a neuter superlative (das Beste, was …) and a whole clause (Er hat gewonnen, was mich freut). With a preposition it becomes wo(r)-: nichts, worüber …; …, wofür ich dankbar bin.",
+      "wo can stand for a place: die Stadt, wo (= in der) ich wohne. After names of towns and countries only wo is used: in Wien, wo …",
+      "wer …, der …: a relative clause without a noun before it (whoever). Wer zu spät kommt, den bestraft das Leben.",
+      "The relative clause is a subordinate clause: commas on both sides, the conjugated verb at the end, and it stands directly after its noun."
+    ],
+    models: [
+      "Der Kollege, mit dem ich das Büro teile, ist sehr hilfsbereit.",
+      "Die Nachbarin, deren Hund immer bellt, ist umgezogen.",
+      "Das ist das Beste, was mir je passiert ist.",
+      "Sie hat die Stelle bekommen, was mich sehr freut.",
+      "Wer einmal lügt, dem glaubt man nicht."
+    ],
+    hu: [
+      "Hungarian aki, ami, amely carry no gender. In German you must know the gender of the noun to choose der, die or das, and then set the case separately. Two decisions, every time.",
+      "aki is not wer after a noun: az ember, aki segített = der Mann, der geholfen hat. wer is only right where Hungarian has aki …, az …: Aki keres, az talál = Wer sucht, der findet.",
+      "ami is not was after a noun: a könyv, amit olvasok = das Buch, das ich lese. was is right where Hungarian has minden, ami / semmi, ami / az, ami: alles, was; nichts, was; das, was.",
+      "Hungarian puts the case ending or postposition on the pronoun (akivel, amiről, aki mellett). German puts a preposition in front of it: mit dem, über das, neben dem.",
+      "akinek a fia = dessen Sohn. Hungarian needs the article and the possessive ending; German allows neither after dessen and deren (not: dessen sein Sohn, not: dessen der Sohn).",
+      "ahol = wo or in + pronoun (a város, ahol lakom = die Stadt, wo / in der ich wohne). For time, German uses a preposition + pronoun where Hungarian has amikor: az év, amikor születtem = das Jahr, in dem ich geboren wurde."
     ]
   }
 };
