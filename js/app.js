@@ -11,6 +11,8 @@ const TYPE_NAMES = { L: "Gap fill", T: "Transformation", E: "Find the error", O:
 const OPEN_TYPES = ["T", "S", "E"];          // more than one answer can be right: unmatched answers are "unsure"
 const TIME_LIMIT = { L: 25, M: 20, O: 40, T: 60, S: 60, E: 45 };  // seconds per item in timed mode
 const SPRINT_LIMIT = { L: 15, M: 8 };       // seconds per item in the endings sprint
+const BUILD_LIMIT = { O: 30 };               // seconds per sentence in sentence building (thread W)
+const W_KINDS = { V2: "Verb second", VL: "Verb last and verb clusters", BR: "Sentence bracket", PR: "Pronouns and middle field", NG: "Position of nicht" };
 const SPRINT_GOAL = { pct: 90, sec: 8 };    // plan v3: 90% right at under 8 seconds an item
 const CAT_NAMES = { G1: "Gender (der, die, das)", G2: "Choosing the case", G3: "Ending pattern" };
 // Error categories for writing and speaking feedback (plan v3, section 7).
@@ -37,6 +39,7 @@ function fresh() {
     cards: [],         // { k, front, back, tags, t, exported }
     checkpoints: [],   // { t, right, n, units: { u: [right, n] } }
     sprints: [],       // { t, right, n, sec, cats: { G1: [right, n] } } endings sprints
+    recons: [],        // { t, id, text, ok, n } reconstructions (thread W): points ticked out of n
     mocks: [],         // { date, module, source, score, t }
     time: [],          // { t, k: A|B|anki|listen, min } study time log
     gone: {},          // deleted things, key → time, so sync doesn't bring them back
@@ -319,14 +322,14 @@ function lastResult(id) {
 
 // ---------- Router ----------
 
-const ROUTES = { today: renderToday, drills: renderDrills, session: renderSession, write: renderWrite, progress: renderProgress, exam: renderExam, setup: renderSetup };
+const ROUTES = { today: renderToday, drills: renderDrills, session: renderSession, write: renderWrite, progress: renderProgress, exam: renderExam, setup: renderSetup, recon: renderRecon };
 function route() { const h = location.hash.slice(1); return ROUTES[h] ? h : "today"; }
 function go(r) { if (location.hash.slice(1) === r) render(); else location.hash = r; }
 function render() {
   const r = route();
   if (r !== "session") stopItemTimer();
   if (r === "session" && !session) { go("drills"); return; }
-  $$("#nav a").forEach(a => a.classList.toggle("on", a.getAttribute("href") === "#" + (r === "session" ? "drills" : r)));
+  $$("#nav a").forEach(a => a.classList.toggle("on", a.getAttribute("href") === "#" + (r === "session" || r === "recon" ? "drills" : r)));
   ROUTES[r]();
   window.scrollTo(0, 0);
 }
@@ -363,7 +366,8 @@ function sessionSteps(u, week) {
   return {
     A: [
       [10, "Mixed warm-up", "12 items from earlier units, shuffled.", "warm"],
-      [10, "Endings sprint", "20 genders and short phrases against the clock. Do it twice if there is time.", "sprint"],
+      [6, "Endings sprint", "20 genders and short phrases against the clock.", "sprint"],
+      [4, "Sentence building", "Five sentences from word tiles, 30 seconds each.", "build"],
       second ? [25, "Timed drill", "The same grammar against the clock.", "timed"]
         : [20, "The new rule", GT.NOTES[u] ? "Read the rule, the model sentences and the notes for Hungarian speakers below." : "Read the rule in your reference grammar: this unit has no page in the app yet.", null],
       [second ? 25 : 30, "Unit drills", "New items first, then the ones you missed.", "new"],
@@ -374,7 +378,8 @@ function sessionSteps(u, week) {
       [5, "Endings sprint", "20 genders and short phrases against the clock.", "sprint"],
       [35, "Writing task", second ? "The longer task or the speaking task of this unit." : "A timed text that needs this unit's grammar.", "write"],
       [25, "Feedback from Claude", "Copy for Claude, read the correction and paste the reply back. The errors go to the log and to Anki.", null],
-      [10, "Unit drills, second round", "Only what you missed.", "new"],
+      reconDue() ? [10, "Reconstruction", "Once a fortnight: read a short model text, hide it and rebuild it from eight key words.", "recon"]
+        : [10, "Unit drills, second round", "Only what you missed.", "new"],
       [10, "Weekly checkpoint", "20 items across all units so far.", "check"]
     ]
   };
@@ -384,6 +389,8 @@ function actionButton(a, u) {
   const map = {
     warm: ["Start warm-up", () => startSession("warm", u), unitsSoFar().some(hasSet)],
     sprint: ["Start sprint", () => startSession("sprint", u), threadItems("G").length > 0],
+    build: ["Build sentences", () => startSession("build", u), threadItems("W").length > 0],
+    recon: ["Open the text", () => { recon = null; go("recon"); }, reconTexts().length > 0],
     new: ["Drill: new and missed", () => startSession("new", u), hasSet(u)],
     all: ["Drill the whole unit", () => startSession("all", u), hasSet(u)],
     E: ["Find the errors", () => startSession("E", u), unitItems(u).some(i => i.type === "E")],
@@ -516,6 +523,8 @@ function renderDrills() {
       <p>Units so far on your track: ${unitsSoFar().filter(hasSet).map(unitName).join(", ") || "none with a set yet"}.</p>
       <div class="row">
         <button data-m="sprint" ${threadItems("G").length ? "" : "disabled"}>Endings sprint (20)</button>
+        <button data-m="build" ${threadItems("W").length ? "" : "disabled"}>Sentence building (5)</button>
+        <button id="reconBtn" ${reconTexts().length ? "" : "disabled"}>Reconstruction${reconDue() ? " (due)" : ""}</button>
         <button data-m="mixed">Mixed review (20)</button>
         <button data-m="check">Weekly checkpoint (20)</button>
       </div>
@@ -538,6 +547,7 @@ function renderDrills() {
   const sel = $("#unitSel");
   if (sel) sel.onchange = () => { drillUnit = sel.value; renderDrills(); };
   $$("button[data-m]").forEach(b => { b.onclick = () => startSession(b.dataset.m, drillUnit || S.settings.unit); });
+  if ($("#reconBtn")) $("#reconBtn").onclick = () => { recon = null; go("recon"); };
   if ($("#copyUnsure")) {
     $("#copyUnsure").onclick = () => copyAndTell(unsurePrompt(), "the unsure answers");
     $("#readVerdicts").onclick = () => readVerdicts($("#verdicts").value);
@@ -550,6 +560,12 @@ let session = null, itemTimer = null;
 
 const threadItems = t => (GT.sets["thread" + t] || { items: [] }).items;
 // Right and total per error category (G1 gender, G2 case, G3 ending pattern) for a list of attempts.
+// Right and total per kind of word-order point (V2, VL, BR, PR, NG) for a list of attempts.
+function buildKinds(atts) {
+  const m = {};
+  atts.forEach(a => { const it = ITEMS[a.id]; if (!it || !it.kind) return; m[it.kind] = m[it.kind] || [0, 0]; m[it.kind][1]++; if (a.r === "R") m[it.kind][0]++; });
+  return m;
+}
 function sprintCats(atts) {
   const m = {};
   atts.forEach(a => { const it = ITEMS[a.id]; if (!it || !it.cat) return; m[it.cat] = m[it.cat] || [0, 0]; m[it.cat][1]++; if (a.r === "R") m[it.cat][0]++; });
@@ -583,6 +599,16 @@ function startSession(mode, u) {
       const base = !l ? 3 : 1 + (l.r !== "R" ? 4 : 0) + Math.min((Date.now() - l.t) / 864e5, 14) / 7;
       return base * (c && c[1] >= 5 ? 2 - c[0] / c[1] : 1.5) * (1 + Math.min(written[it.cat] || 0, 5) / 5);
     }, 20);
+  } else if (mode === "build") {
+    // 5 sentences of thread W from the units so far; unseen and missed ones first, and more of the weakest kind
+    const units = new Set(unitsSoFar());
+    const all = threadItems("W"), pool = all.filter(it => units.has(it.unit));
+    const acc = buildKinds(S.attempts.filter(a => a.m === "build").slice(-40));
+    items = weightedSample(pool.length >= 5 ? pool : all, it => {
+      const l = lastResult(it.id), c = acc[it.kind];
+      const base = !l ? 3 : 1 + (l.r !== "R" ? 4 : 0) + Math.min((Date.now() - l.t) / 864e5, 14) / 7;
+      return base * (c && c[1] >= 4 ? 2 - c[0] / c[1] : 1.5) * (it.unit === S.settings.unit ? 1.5 : 1);
+    }, 5);
   } else if (mode === "check") {
     // spread 20 items evenly over the units so far
     const per = so.map(x => shuffle(unitItems(x)));
@@ -590,7 +616,7 @@ function startSession(mode, u) {
     items = shuffle(items);
   }
   if (!items.length) { toast("No items for this choice yet."); return; }
-  session = { mode, unit: u, items, i: 0, results: [], timed: mode === "timed" || mode === "sprint", done: false };
+  session = { mode, unit: u, items, i: 0, results: [], timed: mode === "timed" || mode === "sprint" || mode === "build", done: false };
   prepItem();
   go("session");
 }
@@ -604,7 +630,7 @@ function prepItem() {
   session.placed = [];
 }
 
-const MODE_NAMES = { new: "New and missed", all: "Whole unit", E: "Find the errors", timed: "Timed drill", mixed: "Mixed review", warm: "Warm-up", check: "Weekly checkpoint", sprint: "Endings sprint" };
+const MODE_NAMES = { new: "New and missed", all: "Whole unit", E: "Find the errors", timed: "Timed drill", mixed: "Mixed review", warm: "Warm-up", check: "Weekly checkpoint", sprint: "Endings sprint", build: "Sentence building" };
 
 function renderSession() {
   if (session.done) return renderSummary();
@@ -674,7 +700,7 @@ function renderSession() {
     $$(".options button").forEach(b => { b.onclick = () => { session.choice = session.order[b.dataset.o]; doCheck(); }; });
     $$("#pool .tile").forEach(b => { b.onclick = () => { session.placed.push(session.pool.splice(b.dataset.q, 1)[0]); renderSession(); }; });
     $$("#placed .tile").forEach(b => { b.onclick = () => { session.pool.push(session.placed.splice(b.dataset.p, 1)[0]); renderSession(); }; });
-    if (session.timed && !itemTimer) startItemTimer((session.mode === "sprint" ? SPRINT_LIMIT : TIME_LIMIT)[it.type] || 30);
+    if (session.timed && !itemTimer) startItemTimer((session.mode === "sprint" ? SPRINT_LIMIT : session.mode === "build" ? BUILD_LIMIT : TIME_LIMIT)[it.type] || 30);
   } else {
     $("#nextBtn").onclick = nextItem;
     $("#nextBtn").focus();
@@ -720,6 +746,7 @@ function doCheck(dunno, timeout) {
   session.checked = { att, given, note: j.note };
   session.results.push(att);
   renderSession();
+  if (session.mode === "build") { att.d = Date.now() - session.shown; saveSoon(); }
   if (session.mode === "sprint") {
     att.d = Date.now() - session.shown; saveSoon();
     const at = session.i;   // a right answer moves on by itself, so the sprint keeps its pace
@@ -743,8 +770,8 @@ function renderSummary() {
   };
   const nodes = byKey("n"), units = byKey("u");
   const missed = res.filter(a => a.r !== "R");
-  const sprint = session.mode === "sprint";
-  const cats = sprint ? sprintCats(res) : null;
+  const sprint = session.mode === "sprint", build = session.mode === "build";
+  const cats = sprint ? sprintCats(res) : null, kinds = build ? buildKinds(res) : null;
   const rightTimes = res.filter(a => a.r === "R" && a.d).map(a => a.d / 1000);
   const sec = rightTimes.length ? Math.round(rightTimes.reduce((x, y) => x + y, 0) / rightTimes.length * 10) / 10 : null;
   if (sprint && !session.saved) {
@@ -763,7 +790,11 @@ function renderSummary() {
       <div class="scroll"><table><thead><tr><th>Kind of error</th><th>Score</th></tr></thead><tbody>
         ${Object.keys(CAT_NAMES).filter(k => cats[k]).map(k => `<tr><td>${esc(CAT_NAMES[k])}</td><td>${cats[k][0]}/${cats[k][1]}</td></tr>`).join("")}
       </tbody></table></div>` : ""}
-      <div class="scroll ${sprint ? "hidden" : ""}"><table><thead><tr><th>${session.mode === "check" ? "Unit" : "Node"}</th><th>Score</th></tr></thead><tbody>
+      ${build ? `<p>${sec === null ? "" : `Average time for a right sentence: <b>${sec} s</b>.`}</p>
+      <div class="scroll"><table><thead><tr><th>Word-order point</th><th>Score</th></tr></thead><tbody>
+        ${Object.keys(W_KINDS).filter(k => kinds[k]).map(k => `<tr><td>${esc(W_KINDS[k])}</td><td>${kinds[k][0]}/${kinds[k][1]}</td></tr>`).join("")}
+      </tbody></table></div>` : ""}
+      <div class="scroll ${sprint || build ? "hidden" : ""}"><table><thead><tr><th>${session.mode === "check" ? "Unit" : "Node"}</th><th>Score</th></tr></thead><tbody>
         ${Object.entries(session.mode === "check" ? units : nodes).map(([k, [r, n]]) => `<tr><td>${esc(session.mode === "check" ? unitName(k) + ": " + UNIT(k).name : k + " " + GT.NODES[k])}</td><td>${r}/${n} <span class="tag ${pct(r, n) >= 85 ? "t-good" : pct(r, n) >= 60 ? "t-mid" : "t-bad"}">${pct(r, n)}%</span></td></tr>`).join("")}
       </tbody></table></div>
       ${missed.length ? `<h3>Not right this time</h3><ul class="list">${missed.map(a => { const it = ITEMS[a.id]; return `<li>${a.r === "U" ? `<span class="tag t-mid">unsure</span> ` : ""}${esc(solutionText(it))}${a.a ? ` <span class="muted">(you: ${esc(a.a)})</span>` : ""}</li>`; }).join("")}</ul>
@@ -1120,10 +1151,100 @@ function tickWrite() {
   step(); writeTick = setInterval(step, 1000);
 }
 
+// ---------- Reconstruction (thread W) ----------
+// Read a model paragraph, hide it, rebuild it from eight key words, then compare the two versions.
+
+let recon = null;   // { id, phase: read | write | compare, text }
+const reconTexts = () => (GT.sets.threadW || {}).texts || [];
+const reconLast = id => Math.max(0, ...S.recons.filter(r => r.id === id).map(r => r.t));
+// The next text: from the units so far, one not done yet first, then the one done longest ago.
+function nextRecon() {
+  const units = new Set(unitsSoFar()), all = reconTexts(), pool = all.filter(t => units.has(String(t.unit)));
+  return (pool.length ? pool : all).slice().sort((a, b) => reconLast(a.id) - reconLast(b.id))[0] || null;
+}
+// Due once a fortnight: ten days after the last one (or after the start of the plan).
+function reconDue() {
+  if (!reconTexts().length) return false;
+  const last = S.recons.length ? S.recons[S.recons.length - 1].t : parseDate(GT.PLAN.start).getTime();
+  return Date.now() - last >= 10 * DAY;
+}
+function reconPrompt(tx, mine) {
+  return `VERGLEICH
+I read a German model paragraph, hid it and rebuilt it from memory with eight key words. Compare my version with the model.
+1. List only the real errors in my version (not the places where I simply chose other words). For each: the wrong part, the correction, the category code (${catListText()}) and the rule in one sentence.
+2. Name the structures of the model that I avoided or simplified.
+Answer in English and quote the German.
+
+Model:
+${tx.text}
+
+My version:
+${mine}`;
+}
+
+function renderRecon() {
+  const all = reconTexts();
+  if (!all.length) { view().innerHTML = `<div class="card"><h2>Reconstruction</h2><p>No texts are installed yet.</p></div>`; return; }
+  if (!recon || !all.some(t => t.id === recon.id)) recon = { id: nextRecon().id, phase: "read", text: "" };
+  const tx = all.find(t => t.id === recon.id);
+  const head = `<div class="row spread"><span class="muted">Reconstruction · ${esc(unitName(String(tx.unit)))} · thread W</span>
+    <span class="muted">${{ read: "1 of 3: read", write: "2 of 3: rebuild", compare: "3 of 3: compare" }[recon.phase]}</span></div>`;
+
+  if (recon.phase === "read") {
+    view().innerHTML = `<div class="card">${head}
+      <label for="rSel">Text</label>
+      <select id="rSel">${all.map(t => `<option value="${t.id}" ${t.id === tx.id ? "selected" : ""}>${esc(unitName(String(t.unit)))}: ${esc(t.title)}${reconLast(t.id) ? " ✓" : ""}</option>`).join("")}</select>
+      <h2>${esc(tx.title)}</h2>
+      <p class="prompt">${esc(tx.text)}</p>
+      <p class="note">Read it two or three times. Notice where the verbs stand and how the sentences begin: don't learn it by heart. Then hide it and write it again from eight key words. The aim is the same content in correct German, not the same words.</p>
+      <div class="row"><button id="rHide" class="primary">Hide the text and rebuild it</button><button id="rBack">Back to drills</button></div>
+    </div>`;
+    $("#rSel").onchange = e => { recon = { id: e.target.value, phase: "read", text: "" }; renderRecon(); };
+    $("#rHide").onclick = () => { recon.phase = "write"; renderRecon(); };
+    $("#rBack").onclick = () => { recon = null; go("drills"); };
+  } else if (recon.phase === "write") {
+    view().innerHTML = `<div class="card">${head}
+      <h2>${esc(tx.title)}</h2>
+      <p>${tx.keys.map(k => `<span class="tag t-acc">${esc(k)}</span>`).join(" ")}</p>
+      <label for="rText">Your version</label>
+      <textarea id="rText" spellcheck="false" autocapitalize="sentences" style="min-height:220px">${esc(recon.text)}</textarea>
+      <p class="note"><span id="rCount"></span> · the model has ${wordCount(tx.text)} words</p>
+      <div class="row"><button id="rCompare" class="primary">Compare with the model</button><button id="rAgain">Read the text again</button></div>
+    </div>`;
+    const ta = $("#rText"), upd = () => { recon.text = ta.value; $("#rCount").textContent = `${wordCount(ta.value)} words`; };
+    ta.oninput = upd; upd(); ta.focus();
+    $("#rCompare").onclick = () => { if (wordCount(recon.text) < 20) { toast("Write at least a few sentences first."); return; } recon.phase = "compare"; renderRecon(); };
+    $("#rAgain").onclick = () => { recon.phase = "read"; renderRecon(); };
+  } else {
+    view().innerHTML = `<div class="card">${head}
+      <h2>${esc(tx.title)}</h2>
+      <div class="grid2">
+        <div><h3>Your version</h3><p style="white-space:pre-wrap">${esc(recon.text)}</p></div>
+        <div><h3>Model</h3><p>${esc(tx.text)}</p></div>
+      </div>
+      <h3>Check these points in your version</h3>
+      <p class="note">Tick what you got right. A different wording is fine as long as the verb positions and the endings are correct.</p>
+      ${tx.points.map((pt, k) => `<p><label style="display:flex;gap:8px;align-items:flex-start;font-weight:400"><input type="checkbox" data-pt="${k}" style="margin-top:4px"> <span>${esc(pt)}</span></label></p>`).join("")}
+      <div class="row">
+        <button id="rSave" class="primary">Save and finish</button>
+        <button id="rCopy">Copy both versions for Claude</button>
+        <button id="rEdit">Change my version</button>
+      </div>
+      <p class="note">Not sure whether a sentence of yours is correct? Copy both versions and paste them into your Claude project.</p>
+    </div>`;
+    $("#rCopy").onclick = () => copyAndTell(reconPrompt(tx, recon.text), "both versions");
+    $("#rEdit").onclick = () => { recon.phase = "write"; renderRecon(); };
+    $("#rSave").onclick = () => {
+      S.recons.push({ t: Date.now(), id: tx.id, text: recon.text, ok: $$("input[data-pt]").filter(c => c.checked).length, n: tx.points.length });
+      save(); recon = null; toast("Reconstruction saved."); go("progress");
+    };
+  }
+}
+
 // ---------- Progress and error log (M3) ----------
 
 function nodeStats(node) {
-  const atts = S.attempts.filter(a => a.n === node && a.m !== "sprint");
+  const atts = S.attempts.filter(a => a.n === node && a.m !== "sprint" && a.m !== "build");
   const recent = atts.slice(-20);
   const weeks = {};
   atts.filter(a => REVIEW_MODES.includes(a.m) && a.r !== "U").forEach(a => {
@@ -1168,6 +1289,9 @@ function renderProgress() {
   }));
   const kinds = Object.entries(kindMap).sort((a, b) => b[1].last3 - a[1].last3 || b[1].all - a[1].all);
   const catAll = sprintCats(S.attempts.filter(a => a.m === "sprint").slice(-100));
+  const buildAtts = S.attempts.filter(a => a.m === "build").slice(-50), kindAll = buildKinds(buildAtts);
+  const buildTimes = buildAtts.filter(a => a.r === "R" && a.d).map(a => a.d / 1000);
+  const buildSec = buildTimes.length ? Math.round(buildTimes.reduce((x, y) => x + y, 0) / buildTimes.length) : null;
   view().innerHTML = `
     <div class="card">
       <h2>Endings sprint</h2>
@@ -1178,6 +1302,16 @@ function renderProgress() {
           ${sprints.map(s => `<tr><td>${esc(localDate(new Date(s.t)))}</td><td>${s.right}/${s.n} <span class="tag ${pct(s.right, s.n) >= SPRINT_GOAL.pct ? "t-good" : pct(s.right, s.n) >= 70 ? "t-mid" : "t-bad"}">${pct(s.right, s.n)}%</span></td><td>${s.sec ?? "—"}</td></tr>`).join("")}
         </tbody></table></div>`
       : `<p class="muted">No sprint yet. It is part of every session: 20 genders and short phrases against the clock.</p>`}
+    </div>
+    <div class="card">
+      <h2>Word order</h2>
+      ${buildAtts.length ? `
+        <p>Sentence building, your last ${buildAtts.length} sentences: <b>${pct(buildAtts.filter(a => a.r === "R").length, buildAtts.length)}%</b> right${buildSec === null ? "" : `, ${buildSec} seconds for a right sentence`}.</p>
+        <div class="scroll"><table><thead><tr><th>Word-order point</th><th>Score</th></tr></thead><tbody>
+          ${Object.keys(W_KINDS).filter(k => kindAll[k]).map(k => `<tr><td>${esc(W_KINDS[k])}</td><td>${kindAll[k][0]}/${kindAll[k][1]} <span class="tag ${pct(...kindAll[k]) >= 85 ? "t-good" : pct(...kindAll[k]) >= 60 ? "t-mid" : "t-bad"}">${pct(...kindAll[k])}%</span></td></tr>`).join("")}
+        </tbody></table></div>`
+      : `<p class="muted">No sentence building yet. It is part of Session A: five sentences from word tiles.</p>`}
+      <p class="note">Reconstructions: ${S.recons.length}${S.recons.length ? `, the last one on ${esc(localDate(new Date(S.recons[S.recons.length - 1].t)))} (${S.recons[S.recons.length - 1].ok} of ${S.recons[S.recons.length - 1].n} points right)` : ""}.${reconDue() ? ` <a href="#recon">The next one is due.</a>` : ""}</p>
     </div>
     <div class="grid2">
       <div class="card"><h2>Drill answers</h2><p><span class="stat">${S.attempts.length}</span> · ${pct(totalR, S.attempts.length) ?? "—"}% right</p></div>
@@ -1557,6 +1691,7 @@ function mergeStates(a, b) {
     .sort((x, y) => x.t - y.t || (x.k < y.k ? -1 : x.k > y.k ? 1 : 0));
   m.checkpoints = union(a.checkpoints, b.checkpoints, x => x.t).sort(by(x => x.t));
   m.sprints = union(a.sprints, b.sprints, x => x.t).sort(by(x => x.t));
+  m.recons = union(a.recons, b.recons, x => x.t).sort(by(x => x.t));
   m.mocks = union(a.mocks, b.mocks, x => JSON.stringify(x)).filter(x => !gone["m:" + JSON.stringify(x)]).sort(by(x => (x.date || "") + JSON.stringify(x)));
   m.time = union(a.time, b.time, x => x.t + x.k).filter(x => !gone["t:" + x.t]).sort(by(x => x.t));
   m.lastBackup = [a.lastBackup, b.lastBackup].filter(Boolean).sort().pop() || null;

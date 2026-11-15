@@ -14,7 +14,7 @@ self.addEventListener("fetch", e => {
   const url = new URL(e.request.url);
   if (e.request.method !== "GET" || url.origin !== location.origin) return;   // sync requests go straight to GitHub
   e.respondWith(
-    fetch(e.request).then(res => {
+    fetch(url.href, { cache: "no-cache" }).then(res => {   // no-cache: ask the server, don't trust the browser's stored copy
       if (res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(e.request, copy)); }
       return res;
     }).catch(() => caches.match(e.request, { ignoreSearch: true }).then(hit => hit || Response.error()))

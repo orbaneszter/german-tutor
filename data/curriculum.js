@@ -7,7 +7,7 @@ GT.sets = GT.sets || {};
 GT.addSet = function (set) { GT.sets[set.thread ? "thread" + set.thread : String(set.unit)] = set; };
 
 // Exercise set files in data/. Add a file here when Claude Code writes a new unit.
-GT.BANK_FILES = ["unit01.js", "unit02.js", "unit03.js", "unit04.js", "unit05.js", "threadG.js"];
+GT.BANK_FILES = ["unit01.js", "unit02.js", "unit03.js", "unit04.js", "unit05.js", "threadG.js", "threadW.js"];
 
 GT.NODES = {
   F1: "Tenses: Perfekt, Präteritum, Plusquamperfekt",

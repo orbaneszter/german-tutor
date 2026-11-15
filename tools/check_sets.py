@@ -12,6 +12,8 @@ DATA = Path(__file__).resolve().parent.parent / "data"
 TYPES = {"L", "T", "E", "O", "S", "M"}
 LEVELS = {"B1", "B2", "C1", "C2"}
 REQUIRED = ["id", "unit", "node", "type", "level", "prompt", "answers", "explain"]
+THREAD_CATS = {"G": {"G1", "G2", "G3"}, "W": {"W"}}
+W_KINDS = {"V2", "VL", "BR", "PR", "NG"}   # verb second, verb last, bracket, pronouns and middle field, nicht
 
 
 def read_curriculum():
@@ -80,8 +82,10 @@ def main():
                 continue
             if str(it["unit"]) != unit:
                 errors.append(f"{where}: unit {it['unit']} doesn't match the file's unit {unit}")
-            if thread and it.get("cat") not in {"G1", "G2", "G3"}:
+            if thread and it.get("cat") not in THREAD_CATS.get(thread, set()):
                 errors.append(f"{where}: thread items need a category (cat)")
+            if thread == "W" and (it.get("kind") not in W_KINDS or it["type"] != "O"):
+                errors.append(f"{where}: thread W items are type O with a kind ({', '.join(sorted(W_KINDS))})")
             if it["node"] not in unit_nodes[unit]:
                 errors.append(f"{where}: node {it['node']} doesn't belong to unit {unit} ({', '.join(unit_nodes[unit])})")
             t = it["type"]
@@ -136,6 +140,29 @@ def main():
             if t in {"T", "S"}:
                 if any(norm(a) == norm(it["prompt"]) for a in ans):
                     errors.append(f"{where}: an answer equals the prompt")
+
+        # Reconstruction texts of thread W: 60–80 words, eight key words taken from the text.
+        for tx in data.get("texts", []):
+            where = f"{name} {tx.get('id', '?')}"
+            missing = [k for k in ["id", "unit", "title", "text", "keys", "points"] if k not in tx]
+            if missing:
+                errors.append(f"{where}: missing {', '.join(missing)}")
+                continue
+            if tx["id"] in seen_ids:
+                errors.append(f"{where}: duplicate id")
+            seen_ids[tx["id"]] = name
+            if str(tx["unit"]) not in unit_nodes:
+                errors.append(f"{where}: unknown unit {tx['unit']}")
+            n = len(tx["text"].split())
+            if not 60 <= n <= 80:
+                errors.append(f"{where}: text has {n} words (60–80 expected)")
+            if len(tx["keys"]) != 8:
+                errors.append(f"{where}: needs exactly eight key words")
+            for k in tx["keys"]:
+                if k.lower() not in tx["text"].lower():
+                    errors.append(f"{where}: key word '{k}' is not in the text")
+            if not tx["points"]:
+                errors.append(f"{where}: needs points to check")
 
     for w in warnings:
         print("warning:", w)
