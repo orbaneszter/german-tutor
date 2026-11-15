@@ -4,7 +4,7 @@ GT.addSet(
  "thread": "W",
  "version": 1,
  "written": "2026-11-15",
- "reviewed": false,
+ "reviewed": true,
  "items": [
   {
    "id": "tW-001",
@@ -158,9 +158,10 @@ GT.addSet(
     "bemerkt"
    ],
    "answers": [
-    "Zum Glück hat niemand den Fehler bemerkt."
+    "Zum Glück hat niemand den Fehler bemerkt.",
+    "Zum Glück hat den Fehler niemand bemerkt."
    ],
-   "explain": "Zum Glück fills position 1, so the order is verb (hat), then subject (niemand)."
+   "explain": "Zum Glück fills position 1, so the order is verb (hat), then subject (niemand). An indefinite subject like niemand may also follow the definite object (hat den Fehler niemand bemerkt)."
   },
   {
    "id": "tW-008",
@@ -336,9 +337,10 @@ GT.addSet(
     "sprechen"
    ],
    "answers": [
-    "Der Kollege, der gestern angerufen hat, möchte dich sprechen."
+    "Der Kollege, der gestern angerufen hat, möchte dich sprechen.",
+    "Der Kollege, der dich sprechen möchte, hat gestern angerufen."
    ],
-   "explain": "A relative clause is a subordinate clause: verb last (angerufen hat). The main clause then continues with its verb (möchte)."
+   "explain": "A relative clause is a subordinate clause: verb last (angerufen hat, or sprechen möchte). The main clause then continues with its finite verb straight after the comma."
   },
   {
    "id": "tW-016",
@@ -359,9 +361,10 @@ GT.addSet(
     "können"
    ],
    "answers": [
-    "Sie erklärte, warum sie nicht früher hatte kommen können."
+    "Sie erklärte, warum sie nicht früher hatte kommen können.",
+    "Sie erklärte, warum sie früher nicht hatte kommen können."
    ],
-   "explain": "With a double infinitive (kommen können) the finite verb (hatte) stands in front of the two infinitives, not at the end."
+   "explain": "With a double infinitive (kommen können) the finite verb (hatte) stands in front of the two infinitives, not at the end. (früher nicht = 'in the past, not' is also possible.)"
   },
   {
    "id": "tW-017",
@@ -394,11 +397,8 @@ GT.addSet(
    "cat": "W",
    "kind": "VL",
    "prompt": "Bilden Sie einen Satz.",
-   "start": "Wenn",
+   "start": "Wenn ich mehr Zeit",
    "words": [
-    "ich",
-    "mehr",
-    "Zeit",
     "hätte",
     "würde",
     "ich",
@@ -540,7 +540,8 @@ GT.addSet(
     "war"
    ],
    "answers": [
-    "Er fragte, warum er nicht früher informiert worden war."
+    "Er fragte, warum er nicht früher informiert worden war.",
+    "Er fragte, warum er früher nicht informiert worden war."
    ],
    "explain": "Verb cluster at the end of the clause: participle + worden + finite verb (informiert worden war)."
   },
@@ -722,7 +723,8 @@ GT.addSet(
     "müssen"
    ],
    "answers": [
-    "Die Unterlagen hätten schon gestern abgegeben werden müssen."
+    "Die Unterlagen hätten schon gestern abgegeben werden müssen.",
+    "Die Unterlagen hätten gestern schon abgegeben werden müssen."
    ],
    "explain": "hätten in position 2; at the end the order is participle + werden + modal infinitive (abgegeben werden müssen)."
   },
@@ -814,10 +816,10 @@ GT.addSet(
     "geschickt"
    ],
    "answers": [
-    "Ich habe ihn dem Chef gestern geschickt.",
-    "Ich habe ihn gestern dem Chef geschickt."
+    "Ich habe ihn gestern dem Chef geschickt.",
+    "Ich habe ihn dem Chef gestern geschickt."
    ],
-   "explain": "A pronoun comes before a noun, whatever the case: ihn (accusative) stands before dem Chef (dative)."
+   "explain": "A pronoun comes before a noun, whatever the case: ihn (accusative) stands before dem Chef (dative). The time adverb usually comes between the pronoun and the noun object."
   },
   {
    "id": "tW-037",
@@ -1314,7 +1316,8 @@ GT.addSet(
     "geschrieben"
    ],
    "answers": [
-    "Er hat nicht angerufen, sondern eine E-Mail geschrieben."
+    "Er hat nicht angerufen, sondern eine E-Mail geschrieben.",
+    "Er hat nicht eine E-Mail geschrieben, sondern angerufen."
    ],
    "explain": "nicht … sondern: nicht stands directly before the part that is corrected (angerufen)."
   },
@@ -1363,9 +1366,10 @@ GT.addSet(
     "hat"
    ],
    "answers": [
-    "Ich glaube, dass er das nicht absichtlich getan hat."
+    "Ich glaube, dass er das nicht absichtlich getan hat.",
+    "Ich glaube, dass er das absichtlich nicht getan hat."
    ],
-   "explain": "nicht stands before the adverb of manner (absichtlich); the verb cluster closes the clause."
+   "explain": "nicht stands before the adverb of manner it negates (nicht absichtlich = not on purpose); the verb cluster closes the clause. absichtlich nicht is also correct but means he deliberately left it undone."
   },
   {
    "id": "tW-061",
@@ -1453,7 +1457,7 @@ GT.addSet(
     "Verb second after an opening adverbial: Seit drei Jahren wohne ich …, Deshalb habe ich …, Heute kann ich …",
     "Verb last after weil, in dem and obwohl: … niemanden kannte, … gefunden habe, … geworden sind",
     "After the obwohl-clause the main clause starts with its verb: …, möchte ich …",
-    "Pronouns directly after verb and subject: fiel es mir schwer, habe ich mich … angemeldet"
+    "Unstressed pronouns stand right after the finite verb, a subject pronoun first: fiel es mir schwer, habe ich mich … angemeldet"
    ]
   },
   {
@@ -1544,7 +1548,7 @@ GT.addSet(
     "Passive perfect: ist … verschoben worden; in the dass-clause: informiert worden sind",
     "The agent with von: vom Land getragen",
     "Verb second after In unserer Stadt, Ursprünglich and Nun; the subject follows the verb",
-    "Impersonal passive without es: Nun wird versprochen, dass …"
+    "No placeholder es when position 1 is filled: Nun wird versprochen, dass … (but: Es wird versprochen, dass …)"
    ]
   }
  ]
