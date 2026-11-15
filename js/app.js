@@ -1352,10 +1352,11 @@ function renderSetup() {
   view().innerHTML = `
     <div class="card">
       <h2>Placement test</h2>
-      ${p ? `<p>Imported (${esc((p.exported || "").slice(0, 10))}). Grammar suggests <b>${esc(trackName(p.grammarTrack))}</b>${p.skillsTrack ? `, reading, listening and writing suggest <b>${esc(trackName(p.skillsTrack))}</b>` : ", and Parts 2–3 weren't filled in"}.</p>
-        <p class="big">Suggested: ${esc(trackName(suggested))}</p>
+      ${p ? `<p>Imported (${esc((p.exported || "").slice(0, 10))}).${S.settings.track === "J" ? "</p><p hidden>" : ""} Grammar suggests <b>${esc(trackName(p.grammarTrack))}</b>${p.skillsTrack ? `, reading, listening and writing suggest <b>${esc(trackName(p.skillsTrack))}</b>` : ", and Parts 2–3 weren't filled in"}.</p>
+        ${S.settings.track === "J" ? `<p>${(p.bands || []).map(x => `${esc(x.name)}: <b>${x.right}/${x.total}</b>`).join(" · ")}</p>` : `<p class="big">Suggested: ${esc(trackName(suggested))}</p>`}
         ${p.grammarTrack && p.skillsTrack && Math.abs(["C", "B", "A"].indexOf(p.grammarTrack) - ["C", "B", "A"].indexOf(p.skillsTrack)) === 2 ? `<p class="note">The two results are two tracks apart. Plan v2 suggests one tutor session to confirm your level before you commit.</p>` : ""}
-        ${S.settings.track !== suggested ? `<button id="useSug" class="primary">Use ${esc(GT.TRACKS[suggested].name)}</button>` : `<p class="note">You're on the suggested track.</p>`}`
+        ${S.settings.track === "J" ? `<p class="note">Your plan stays "${esc(GT.TRACKS.J.name)}". The result is used for your score per unit on the Progress page.</p>`
+          : S.settings.track !== suggested ? `<button id="useSug" class="primary">Use ${esc(GT.TRACKS[suggested].name)}</button>` : `<p class="note">You're on the suggested track.</p>`}`
       : `<p>Optional. Open the <a href="placement-test.html">placement test</a>, do Part 1 (grammar, about 40 minutes) and use <b>Download results (JSON)</b> on its results page. Then import the file here. Skip Parts 2 and 3, so the C1 Modellsatz stays unused for June.</p>
          ${localPlacement ? `<p class="note">This browser has placement-test answers saved, so you've started it here. Download the results JSON from its results page.</p>` : ""}`}
       <div class="row" style="margin-top:8px"><label class="btn" for="plIn" style="margin:0;font-weight:400">Import placement results (JSON)</label><input type="file" id="plIn" accept=".json" class="hidden"></div>
