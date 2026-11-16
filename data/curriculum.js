@@ -7,7 +7,7 @@ GT.sets = GT.sets || {};
 GT.addSet = function (set) { GT.sets[set.thread ? "thread" + set.thread : String(set.unit)] = set; };
 
 // Exercise set files in data/. Add a file here when Claude Code writes a new unit.
-GT.BANK_FILES = ["unit01.js", "unit02.js", "unit03.js", "unit04.js", "unit05.js", "unit06.js", "threadG.js", "threadW.js"];
+GT.BANK_FILES = ["unit01.js", "unit02.js", "unit03.js", "unit04.js", "unit05.js", "unit06.js", "unit07.js", "threadG.js", "threadW.js"];
 
 GT.NODES = {
   F1: "Tenses: Perfekt, Präteritum, Plusquamperfekt",
@@ -267,6 +267,34 @@ GT.NOTES = {
       "Hungarian puts the case ending or postposition on the pronoun (akivel, amiről, aki mellett). German puts a preposition in front of it: mit dem, über das, neben dem.",
       "akinek a fia = dessen Sohn or deren Sohn, depending on the gender of the owner. Hungarian needs the article and the possessive ending; German allows neither after dessen and deren (not: dessen sein Sohn, not: dessen der Sohn).",
       "ahol = wo or in + pronoun (a város, ahol lakom = die Stadt, wo / in der ich wohne). For time, German uses a preposition + pronoun where Hungarian has amikor: az év, amikor születtem = das Jahr, in dem ich geboren wurde."
+    ]
+  },
+  "7": {
+    rules: [
+      "Most verbs, nouns and adjectives are followed by zu + infinitive at the end of its clause: Ich habe vergessen, dich anzurufen. Es ist schwer, das zu verstehen. Ich habe keine Lust, auszugehen.",
+      "Separable verbs take zu between prefix and verb, in one word: anzurufen, aufzumachen, zuzuhören. Inseparable verbs take zu in front: zu verstehen, zu beantworten.",
+      "No zu after modal verbs, lassen, sehen, hören, gehen and bleiben: Ich muss arbeiten. Sie lässt das Auto reparieren. Ich höre ihn kommen. Wir gehen essen.",
+      "An infinitive clause is possible when its subject is already in the main clause, as subject (Ich hoffe, zu kommen) or object (Ich bitte dich, zu kommen). Otherwise use dass.",
+      "um … zu (purpose), ohne … zu (something expected does not happen), (an)statt … zu (instead). With a different subject: damit, ohne dass.",
+      "Perfect infinitive for an earlier action: participle + zu haben / zu sein (Er behauptet, nichts gewusst zu haben). Passive infinitive: participle + zu werden (Sie hofft, befördert zu werden). With a modal verb: sprechen zu können.",
+      "sein + zu + infinitive = a passive with müssen or können (Die Rechnung ist zu bezahlen). haben + zu + infinitive = müssen (Ich habe viel zu tun). nicht brauchen + zu = nicht müssen. scheinen + zu: Er scheint krank zu sein.",
+      "A verb with a fixed preposition keeps it as a da-word before the infinitive clause: Ich freue mich darauf, dich zu sehen. Er besteht darauf, selbst zu fahren."
+    ],
+    models: [
+      "Ich habe keine Lust, heute Abend auszugehen.",
+      "Sie ist nach Wien gezogen, um dort zu studieren.",
+      "Er ging, ohne sich zu verabschieden.",
+      "Er behauptet, den Film schon gesehen zu haben.",
+      "Die Rechnung ist bis Freitag zu bezahlen."
+    ],
+    hu: [
+      "The Hungarian infinitive (-ni) never takes a particle: Nincs kedvem moziba menni. In German the infinitive needs zu here: Ich habe keine Lust, ins Kino zu gehen. Leaving out zu is the typical error.",
+      "Where Hungarian uses a hogy-clause with the imperative mood (Megkért, hogy segítsek neki), German prefers the infinitive clause: Er hat mich gebeten, ihm zu helfen.",
+      "azért, hogy … / hogy + imperative mood = um … zu when the subject is the same, damit when it is different. Hungarian makes no such difference, so check the subject every time.",
+      "anélkül, hogy = ohne … zu or ohne dass; ahelyett, hogy = statt … zu. With ohne and statt the nicht of the original sentence disappears.",
+      "Hungarian has no perfect infinitive. Azt állítja, hogy látta a filmet becomes Er behauptet, den Film gesehen zu haben: the earlier time must be shown in the infinitive.",
+      "The Hungarian prefix moves away from its verb (fel akarlak hívni, fel kell hívni). In German the prefix stays attached and only zu comes between: anzurufen. And kell + infinitive is müssen without zu: Ich muss anrufen.",
+      "Hungarian -andó/-endő (a számla befizetendő) corresponds to sein + zu: Die Rechnung ist zu bezahlen."
     ]
   }
 };
