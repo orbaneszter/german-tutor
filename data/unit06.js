@@ -4,7 +4,7 @@ GT.addSet(
  "unit": 6,
  "version": 1,
  "written": "2026-11-15",
- "reviewed": false,
+ "reviewed": true,
  "items": [
   {
    "id": "u06-001",
@@ -318,9 +318,10 @@ GT.addSet(
    "level": "B2",
    "prompt": "Das ist das Beste, ___ mir je passiert ist.",
    "answers": [
-    "was"
+    "was",
+    "das"
    ],
-   "explain": "After a neuter superlative used as a noun (das Beste, das Schönste) the relative pronoun is was."
+   "explain": "After a neuter superlative used as a noun (das Beste, das Schönste) the relative pronoun is was. das also occurs, but was is the standard form."
   },
   {
    "id": "u06-026",
@@ -393,7 +394,7 @@ GT.addSet(
    "answers": [
     "wo"
    ],
-   "explain": "After the name of a country or town the relative clause starts with wo."
+   "explain": "After the name of a country or town, 'where' is always wo; in + relative pronoun is not possible here."
   },
   {
    "id": "u06-032",
@@ -413,7 +414,7 @@ GT.addSet(
    "node": "N09",
    "type": "S",
    "level": "B2",
-   "instruction": "Verbinden Sie die Sätze mit einem Relativsatz.",
+   "instruction": "Verbinden Sie die Sätze: Der zweite Satz wird zum Relativsatz.",
    "prompt": "Das ist der Mann. Er hat mir geholfen.",
    "answers": [
     "Das ist der Mann, der mir geholfen hat."
@@ -426,7 +427,7 @@ GT.addSet(
    "node": "N09",
    "type": "S",
    "level": "B2",
-   "instruction": "Verbinden Sie die Sätze mit einem Relativsatz.",
+   "instruction": "Verbinden Sie die Sätze: Der zweite Satz wird zum Relativsatz.",
    "prompt": "Ich suche das Buch. Du hast es mir empfohlen.",
    "answers": [
     "Ich suche das Buch, das du mir empfohlen hast."
@@ -439,13 +440,13 @@ GT.addSet(
    "node": "N09",
    "type": "S",
    "level": "B2",
-   "instruction": "Verbinden Sie die Sätze mit einem Relativsatz.",
+   "instruction": "Verbinden Sie die Sätze: Der zweite Satz wird zum Relativsatz.",
    "prompt": "Die Kollegin ist krank. Ich arbeite mit ihr zusammen.",
    "answers": [
     "Die Kollegin, mit der ich zusammenarbeite, ist krank.",
     "Die Kollegin ist krank, mit der ich zusammenarbeite."
    ],
-   "explain": "mit ihr becomes mit der. The relative clause follows its noun directly; the separable verb is written as one word at the end."
+   "explain": "mit ihr becomes mit der; the separable verb is written as one word at the end. The relative clause normally follows its noun directly."
   },
   {
    "id": "u06-036",
@@ -453,7 +454,7 @@ GT.addSet(
    "node": "N09",
    "type": "S",
    "level": "B2",
-   "instruction": "Verbinden Sie die Sätze mit einem Relativsatz.",
+   "instruction": "Verbinden Sie die Sätze: Der zweite Satz wird zum Relativsatz.",
    "prompt": "Der Nachbar ist sehr nett. Sein Sohn studiert in Berlin.",
    "answers": [
     "Der Nachbar, dessen Sohn in Berlin studiert, ist sehr nett."
@@ -466,10 +467,11 @@ GT.addSet(
    "node": "N09",
    "type": "S",
    "level": "B2",
-   "instruction": "Verbinden Sie die Sätze mit einem Relativsatz.",
+   "instruction": "Verbinden Sie die Sätze: Der zweite Satz wird zum Relativsatz.",
    "prompt": "Die Schriftstellerin hat einen Preis bekommen. Ihre Romane sind sehr bekannt.",
    "answers": [
-    "Die Schriftstellerin, deren Romane sehr bekannt sind, hat einen Preis bekommen."
+    "Die Schriftstellerin, deren Romane sehr bekannt sind, hat einen Preis bekommen.",
+    "Die Schriftstellerin hat einen Preis bekommen, deren Romane sehr bekannt sind."
    ],
    "explain": "ihre Romane becomes deren Romane (feminine owner)."
   },
@@ -479,7 +481,7 @@ GT.addSet(
    "node": "N09",
    "type": "S",
    "level": "B2",
-   "instruction": "Verbinden Sie die Sätze mit einem Relativsatz.",
+   "instruction": "Verbinden Sie die Sätze: Der zweite Satz wird zum Relativsatz.",
    "prompt": "Das sind die Gäste. Wir haben auf sie gewartet.",
    "answers": [
     "Das sind die Gäste, auf die wir gewartet haben."
@@ -492,7 +494,7 @@ GT.addSet(
    "node": "N09",
    "type": "S",
    "level": "B2",
-   "instruction": "Verbinden Sie die Sätze mit einem Relativsatz.",
+   "instruction": "Verbinden Sie die Sätze: Der zweite Satz wird zum Relativsatz.",
    "prompt": "Der Zug hatte Verspätung. Ich wollte mit ihm fahren.",
    "answers": [
     "Der Zug, mit dem ich fahren wollte, hatte Verspätung."
@@ -505,7 +507,7 @@ GT.addSet(
    "node": "N09",
    "type": "S",
    "level": "B2",
-   "instruction": "Verbinden Sie die Sätze mit einem Relativsatz.",
+   "instruction": "Verbinden Sie die Sätze: Der zweite Satz wird zum Relativsatz.",
    "prompt": "Er hat mir ein Angebot gemacht. Ich habe lange darüber nachgedacht.",
    "answers": [
     "Er hat mir ein Angebot gemacht, über das ich lange nachgedacht habe."
@@ -518,7 +520,7 @@ GT.addSet(
    "node": "N09",
    "type": "S",
    "level": "B2",
-   "instruction": "Verbinden Sie die Sätze mit einem Relativsatz.",
+   "instruction": "Verbinden Sie die Sätze: Der zweite Satz wird zum Relativsatz.",
    "prompt": "Sie hat die Stelle bekommen. Das freut mich sehr.",
    "answers": [
     "Sie hat die Stelle bekommen, was mich sehr freut."
@@ -531,7 +533,7 @@ GT.addSet(
    "node": "N09",
    "type": "S",
    "level": "C1",
-   "instruction": "Verbinden Sie die Sätze mit einem Relativsatz.",
+   "instruction": "Verbinden Sie die Sätze: Der zweite Satz wird zum Relativsatz.",
    "prompt": "Er kommt immer zu spät. Darüber ärgere ich mich.",
    "answers": [
     "Er kommt immer zu spät, worüber ich mich ärgere."
@@ -544,7 +546,7 @@ GT.addSet(
    "node": "N09",
    "type": "S",
    "level": "B2",
-   "instruction": "Verbinden Sie die Sätze mit einem Relativsatz.",
+   "instruction": "Verbinden Sie die Sätze: Der zweite Satz wird zum Relativsatz.",
    "prompt": "Das Dorf ist sehr klein. Ich bin dort geboren.",
    "answers": [
     "Das Dorf, in dem ich geboren bin, ist sehr klein.",
@@ -558,10 +560,11 @@ GT.addSet(
    "node": "N09",
    "type": "S",
    "level": "B2",
-   "instruction": "Verbinden Sie die Sätze mit einem Relativsatz.",
+   "instruction": "Verbinden Sie die Sätze: Der zweite Satz wird zum Relativsatz.",
    "prompt": "Die Kollegen haben mir gratuliert. Ich habe ihnen von meinem Erfolg erzählt.",
    "answers": [
-    "Die Kollegen, denen ich von meinem Erfolg erzählt habe, haben mir gratuliert."
+    "Die Kollegen, denen ich von meinem Erfolg erzählt habe, haben mir gratuliert.",
+    "Die Kollegen haben mir gratuliert, denen ich von meinem Erfolg erzählt habe."
    ],
    "explain": "ihnen (dative plural) becomes denen."
   },
@@ -571,7 +574,7 @@ GT.addSet(
    "node": "N09",
    "type": "S",
    "level": "B2",
-   "instruction": "Verbinden Sie die Sätze mit einem Relativsatz.",
+   "instruction": "Verbinden Sie die Sätze: Der zweite Satz wird zum Relativsatz.",
    "prompt": "Das ist der Arzt. Ich habe dir von ihm erzählt.",
    "answers": [
     "Das ist der Arzt, von dem ich dir erzählt habe."
@@ -584,7 +587,7 @@ GT.addSet(
    "node": "N09",
    "type": "S",
    "level": "C1",
-   "instruction": "Verbinden Sie die Sätze mit einem Relativsatz.",
+   "instruction": "Verbinden Sie die Sätze: Der zweite Satz wird zum Relativsatz.",
    "prompt": "Ich habe einen Freund. Seiner Schwester gehört das Café.",
    "answers": [
     "Ich habe einen Freund, dessen Schwester das Café gehört."
@@ -597,10 +600,11 @@ GT.addSet(
    "node": "N09",
    "type": "S",
    "level": "B2",
-   "instruction": "Verbinden Sie die Sätze mit einem Relativsatz.",
+   "instruction": "Verbinden Sie die Sätze: Der zweite Satz wird zum Relativsatz.",
    "prompt": "Die Studie wurde gestern veröffentlicht. Ihre Ergebnisse haben viele überrascht.",
    "answers": [
-    "Die Studie, deren Ergebnisse viele überrascht haben, wurde gestern veröffentlicht."
+    "Die Studie, deren Ergebnisse viele überrascht haben, wurde gestern veröffentlicht.",
+    "Die Studie wurde gestern veröffentlicht, deren Ergebnisse viele überrascht haben."
    ],
    "explain": "ihre Ergebnisse becomes deren Ergebnisse (feminine owner)."
   },
@@ -610,11 +614,13 @@ GT.addSet(
    "node": "N09",
    "type": "S",
    "level": "B2",
-   "instruction": "Verbinden Sie die Sätze mit einem Relativsatz.",
+   "instruction": "Verbinden Sie die Sätze: Der zweite Satz wird zum Relativsatz.",
    "prompt": "Das Haus wird verkauft. In dem Haus bin ich aufgewachsen.",
    "answers": [
     "Das Haus, in dem ich aufgewachsen bin, wird verkauft.",
-    "Das Haus, wo ich aufgewachsen bin, wird verkauft."
+    "Das Haus, wo ich aufgewachsen bin, wird verkauft.",
+    "Das Haus wird verkauft, in dem ich aufgewachsen bin.",
+    "Das Haus wird verkauft, wo ich aufgewachsen bin."
    ],
    "explain": "in dem Haus becomes in dem (or wo for a place); the auxiliary is last."
   },
@@ -641,7 +647,8 @@ GT.addSet(
    "instruction": "Formen Sie das Attribut in einen Relativsatz um.",
    "prompt": "Die gestern angekommenen Gäste wohnen im Hotel.",
    "answers": [
-    "Die Gäste, die gestern angekommen sind, wohnen im Hotel."
+    "Die Gäste, die gestern angekommen sind, wohnen im Hotel.",
+    "Die Gäste, die gestern ankamen, wohnen im Hotel."
    ],
    "explain": "The participle becomes the verb of the relative clause: angekommen sind (perfect with sein)."
   },
@@ -1035,11 +1042,11 @@ GT.addSet(
    "node": "N09",
    "type": "E",
    "level": "B2",
-   "prompt": "Er hat das Spiel gewonnen, das mich sehr freut.",
+   "prompt": "Er hat endlich gewonnen, das mich sehr freut.",
    "answers": [
-    "Er hat das Spiel gewonnen, was mich sehr freut."
+    "Er hat endlich gewonnen, was mich sehr freut."
    ],
-   "explain": "What pleases me is the whole fact, not the game: reference to a whole clause needs was."
+   "explain": "There is no noun for das to refer to: the relative clause comments on the whole main clause, and that needs was."
   },
   {
    "id": "u06-074",
@@ -1062,14 +1069,14 @@ GT.addSet(
    "prompt": "Das ist das Schönste, ___ ich je gesehen habe.",
    "options": [
     "was",
-    "das",
-    "welches",
+    "wer",
+    "den",
     "wo"
    ],
    "answers": [
     "was"
    ],
-   "explain": "After a neuter superlative used as a noun: was."
+   "explain": "After a neuter superlative used as a noun the standard relative pronoun is was."
   },
   {
    "id": "u06-076",

@@ -249,9 +249,9 @@ GT.NOTES = {
       "dessen and deren (whose) follow the owner, not the thing owned, and never change: die Frau, deren Hund …; der Mann, dessen Tochter … No article and no possessive comes after them.",
       "A preposition always stands in front of the relative pronoun and decides its case: der Kollege, mit dem ich arbeite; das Thema, über das wir sprechen.",
       "was follows alles, etwas, nichts, vieles, das, a neuter superlative (das Beste, was …) and a whole clause (Er hat gewonnen, was mich freut). With a preposition it becomes wo(r)-: nichts, worüber …; …, wofür ich dankbar bin.",
-      "wo can stand for a place: die Stadt, wo (= in der) ich wohne. After names of towns and countries only wo is used: in Wien, wo …",
-      "wer …, der …: a relative clause without a noun before it (whoever). Wer zu spät kommt, den bestraft das Leben.",
-      "The relative clause is a subordinate clause: commas on both sides, the conjugated verb at the end, and it stands directly after its noun."
+      "wo can stand for a place: die Stadt, wo (= in der) ich wohne. After names of towns and countries 'where' is always wo, never in + pronoun: in Wien, wo …",
+      "wer …, der …: a relative clause without a noun before it (whoever). Wer zu spät kommt, den bestraft das Leben. der may be left out when both pronouns are in the nominative: Wer sucht, (der) findet.",
+      "The relative clause is a subordinate clause: commas on both sides, the conjugated verb at the end. It normally stands directly after its noun; only a short closing verb part may come between: Ich habe den Film gesehen, den du empfohlen hast."
     ],
     models: [
       "Der Kollege, mit dem ich das Büro teile, ist sehr hilfsbereit.",
@@ -261,11 +261,11 @@ GT.NOTES = {
       "Wer einmal lügt, dem glaubt man nicht."
     ],
     hu: [
-      "Hungarian aki, ami, amely carry no gender. In German you must know the gender of the noun to choose der, die or das, and then set the case separately. Two decisions, every time.",
-      "aki is not wer after a noun: az ember, aki segített = der Mann, der geholfen hat. wer is only right where Hungarian has aki …, az …: Aki keres, az talál = Wer sucht, der findet.",
+      "Hungarian aki, ami, amely carry number and case, but no gender. In German you must know the gender of the noun to choose der, die or das, and then set the case separately. Two decisions, every time.",
+      "aki is not wer after a noun: a férfi, aki segített = der Mann, der geholfen hat. wer is only right where Hungarian has aki …, az …: Aki keres, az talál = Wer sucht, der findet.",
       "ami is not was after a noun: a könyv, amit olvasok = das Buch, das ich lese. was is right where Hungarian has minden, ami / semmi, ami / az, ami: alles, was; nichts, was; das, was.",
       "Hungarian puts the case ending or postposition on the pronoun (akivel, amiről, aki mellett). German puts a preposition in front of it: mit dem, über das, neben dem.",
-      "akinek a fia = dessen Sohn. Hungarian needs the article and the possessive ending; German allows neither after dessen and deren (not: dessen sein Sohn, not: dessen der Sohn).",
+      "akinek a fia = dessen Sohn or deren Sohn, depending on the gender of the owner. Hungarian needs the article and the possessive ending; German allows neither after dessen and deren (not: dessen sein Sohn, not: dessen der Sohn).",
       "ahol = wo or in + pronoun (a város, ahol lakom = die Stadt, wo / in der ich wohne). For time, German uses a preposition + pronoun where Hungarian has amikor: az év, amikor születtem = das Jahr, in dem ich geboren wurde."
     ]
   }
