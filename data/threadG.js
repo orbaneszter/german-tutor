@@ -4,7 +4,7 @@ GT.addSet(
  "thread": "G",
  "version": 2,
  "written": "2026-11-12 (batch 1), 2026-11-16 (batch 2)",
- "reviewed": false,
+ "reviewed": true,
  "items": [
   {
    "id": "tG-001",
@@ -2450,7 +2450,7 @@ GT.addSet(
    "answers": [
     "die"
    ],
-   "explain": "die Musik. Nouns in -ik are feminine. No plural in normal use."
+   "explain": "die Musik. Most nouns in -ik are feminine. No plural in normal use."
   },
   {
    "id": "tG-164",
@@ -2469,7 +2469,7 @@ GT.addSet(
    "answers": [
     "die"
    ],
-   "explain": "die Kultur. Nouns in -ur are feminine. Plural: die Kulturen."
+   "explain": "die Kultur. Most nouns in -ur are feminine (but: das Abitur). Plural: die Kulturen."
   },
   {
    "id": "tG-165",
@@ -2507,7 +2507,7 @@ GT.addSet(
    "answers": [
     "die"
    ],
-   "explain": "die Demokratie. Nouns in -ie are feminine. Plural: die Demokratien."
+   "explain": "die Demokratie. Most nouns in -ie are feminine (but: das Genie). Plural: die Demokratien."
   },
   {
    "id": "tG-167",
@@ -2602,7 +2602,7 @@ GT.addSet(
    "answers": [
     "die"
    ],
-   "explain": "die Firma. Most nouns in -a are feminine. Plural: die Firmen."
+   "explain": "die Firma. Many nouns in -a are feminine (but: das Thema, das Klima). Plural: die Firmen."
   },
   {
    "id": "tG-172",
@@ -2621,7 +2621,7 @@ GT.addSet(
    "answers": [
     "die"
    ],
-   "explain": "die Butter. No rule helps here: learn it with the article. No plural in normal use."
+   "explain": "die Butter. No rule helps here: learn it with the article (der Butter is southern dialect, not standard). No plural in normal use."
   },
   {
    "id": "tG-173",
@@ -2792,7 +2792,7 @@ GT.addSet(
    "answers": [
     "das"
    ],
-   "explain": "das Instrument. Nouns in -ment are neuter. Plural: die Instrumente."
+   "explain": "das Instrument. Most nouns in -ment are neuter (but: der Moment, der Zement). Plural: die Instrumente."
   },
   {
    "id": "tG-182",
@@ -2811,7 +2811,7 @@ GT.addSet(
    "answers": [
     "das"
    ],
-   "explain": "das Studium. Nouns in -um are neuter. Plural: die Studien."
+   "explain": "das Studium. Latin words in -um are neuter. Plural: die Studien."
   },
   {
    "id": "tG-183",
@@ -2830,7 +2830,7 @@ GT.addSet(
    "answers": [
     "das"
    ],
-   "explain": "das Datum. Nouns in -um are neuter. Plural: die Daten."
+   "explain": "das Datum. Latin words in -um are neuter. Plural: die Daten."
   },
   {
    "id": "tG-184",
@@ -3134,7 +3134,7 @@ GT.addSet(
    "answers": [
     "der"
    ],
-   "explain": "der Direktor. Nouns in -or are masculine. Plural: die Direktoren."
+   "explain": "der Direktor. Most nouns in -or are masculine (but: das Labor). Plural: die Direktoren."
   },
   {
    "id": "tG-200",
@@ -3343,7 +3343,7 @@ GT.addSet(
    "answers": [
     "der"
    ],
-   "explain": "der Gedanke. An exception twice over (Ge- and -e), and it adds -n in all other cases: des Gedankens. Plural: die Gedanken."
+   "explain": "der Gedanke. An exception twice over (Ge- and -e); it has -n in the accusative and dative and -ns in the genitive: des Gedankens. Plural: die Gedanken."
   },
   {
    "id": "tG-211",
@@ -3486,11 +3486,11 @@ GT.addSet(
    "level": "B2",
    "cat": "G2",
    "batch": 2,
-   "prompt": "Ich danke ___ Kollegen. (der, nett)",
+   "prompt": "Ich danke ___ Mitarbeiter. (der, nett)",
    "answers": [
     "dem netten"
    ],
-   "explain": "danken takes the dative: dem netten Kollegen."
+   "explain": "danken takes the dative: dem netten Mitarbeiter."
   },
   {
    "id": "tG-219",
@@ -3882,11 +3882,11 @@ GT.addSet(
    "level": "B2",
    "cat": "G2",
    "batch": 2,
-   "prompt": "Es hängt von ___ Wetter ab. (das)",
+   "prompt": "Das hängt von ___ Entscheidung ab. (dein)",
    "answers": [
-    "dem"
+    "deiner"
    ],
-   "explain": "abhängen von + dative."
+   "explain": "abhängen von + dative; feminine: deiner."
   },
   {
    "id": "tG-247",
@@ -4134,9 +4134,9 @@ GT.addSet(
    "level": "B2",
    "cat": "G2",
    "batch": 2,
-   "prompt": "Das Flugzeug fliegt über ___ Stadt. (die, groß)",
+   "prompt": "Wir gehen über ___ Brücke. (die, alt)",
    "answers": [
-    "die große"
+    "die alte"
    ],
    "explain": "Movement across something: über + accusative."
   },
@@ -4443,13 +4443,13 @@ GT.addSet(
    "level": "B2",
    "cat": "G3",
    "batch": 2,
-   "prompt": "Wir danken ___. (unser Nachbar)",
+   "prompt": "Wir danken ___. (unser Architekt)",
    "answers": [
-    "unserem Nachbarn",
-    "unserm Nachbarn",
-    "unsrem Nachbarn"
+    "unserem Architekten",
+    "unserm Architekten",
+    "unsrem Architekten"
    ],
-   "explain": "n-declension: Nachbar takes -n. danken + dative."
+   "explain": "n-declension: nouns in -ekt take -en. danken + dative."
   },
   {
    "id": "tG-287",
@@ -4613,11 +4613,11 @@ GT.addSet(
    "level": "B2",
    "cat": "G3",
    "batch": 2,
-   "prompt": "Das Auto ___ ist neu. (mein Nachbar)",
+   "prompt": "Das Auto ___ ist neu. (mein Assistent)",
    "answers": [
-    "meines Nachbarn"
+    "meines Assistenten"
    ],
-   "explain": "n-declension: the genitive is meines Nachbarn, without -s."
+   "explain": "n-declension: the genitive is meines Assistenten, without -s."
   },
   {
    "id": "tG-299",
