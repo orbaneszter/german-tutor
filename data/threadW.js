@@ -1,10 +1,9 @@
 // Thread W · word order: sentence-building items and reconstruction texts (plan v3, section 6). Batches 1 and 2.
-GT.addSet(
-{
+GT.addSet({
  "thread": "W",
  "version": 2,
  "written": "2026-11-15 (batch 1), 2026-11-16 (batch 2)",
- "reviewed": false,
+ "reviewed": true,
  "items": [
   {
    "id": "tW-001",
@@ -1639,9 +1638,10 @@ GT.addSet(
     "vergessen"
    ],
    "answers": [
-    "Er wollte anrufen, aber er hatte ihre Nummer vergessen."
+    "Er wollte anrufen, aber er hatte ihre Nummer vergessen.",
+    "Er wollte anrufen, aber ihre Nummer hatte er vergessen."
    ],
-   "explain": "aber stands in position 0 and does not change the word order."
+   "explain": "aber stands in position 0 and does not change the word order: one element (er, or for contrast ihre Nummer), then the verb."
   },
   {
    "id": "tW-073",
@@ -1663,9 +1663,10 @@ GT.addSet(
     "Hause"
    ],
    "answers": [
-    "Wir fahren nicht ans Meer, sondern wir bleiben dieses Jahr zu Hause."
+    "Wir fahren nicht ans Meer, sondern wir bleiben dieses Jahr zu Hause.",
+    "Wir fahren nicht ans Meer, sondern dieses Jahr bleiben wir zu Hause."
    ],
-   "explain": "sondern stands in position 0: subject and verb follow in the normal order."
+   "explain": "sondern stands in position 0: one element follows (wir, or dieses Jahr), then the verb in second place."
   },
   {
    "id": "tW-074",
@@ -1700,11 +1701,8 @@ GT.addSet(
    "kind": "KO",
    "batch": 2,
    "prompt": "Bilden Sie einen Satz.",
-   "start": "Obwohl",
+   "start": "Obwohl er wenig Zeit",
    "words": [
-    "er",
-    "wenig",
-    "Zeit",
     "hatte",
     "hat",
     "er",
@@ -1772,11 +1770,8 @@ GT.addSet(
    "kind": "KO",
    "batch": 2,
    "prompt": "Bilden Sie einen Satz.",
-   "start": "Seitdem",
+   "start": "Seitdem sie in Wien",
    "words": [
-    "sie",
-    "in",
-    "Wien",
     "wohnt",
     "sehen",
     "wir",
@@ -1820,10 +1815,8 @@ GT.addSet(
    "kind": "KO",
    "batch": 2,
    "prompt": "Bilden Sie einen Satz.",
-   "start": "Falls",
+   "start": "Falls es morgen",
    "words": [
-    "es",
-    "morgen",
     "regnet",
     "bleiben",
     "wir",
@@ -1845,10 +1838,8 @@ GT.addSet(
    "kind": "KO",
    "batch": 2,
    "prompt": "Bilden Sie einen Satz.",
-   "start": "Da",
+   "start": "Da sie krank",
    "words": [
-    "sie",
-    "krank",
     "war",
     "musste",
     "der",
@@ -1871,10 +1862,8 @@ GT.addSet(
    "kind": "KO",
    "batch": 2,
    "prompt": "Bilden Sie einen Satz.",
-   "start": "Bevor",
+   "start": "Bevor du gehst,",
    "words": [
-    "du",
-    "gehst",
     "musst",
     "du",
     "noch",
@@ -1886,7 +1875,7 @@ GT.addSet(
     "Bevor du gehst, musst du noch das Fenster schließen.",
     "Bevor du gehst, musst du das Fenster noch schließen."
    ],
-   "explain": "bevor: verb last; then the main clause with its verb first (musst du)."
+   "explain": "The bevor-clause is position 1, so the main clause continues with its verb (musst du)."
   },
   {
    "id": "tW-083",
@@ -1910,7 +1899,8 @@ GT.addSet(
     "Familie"
    ],
    "answers": [
-    "Je mehr er arbeitet, desto weniger Zeit hat er für die Familie."
+    "Je mehr er arbeitet, desto weniger Zeit hat er für die Familie.",
+    "Je mehr er arbeitet, desto weniger Zeit für die Familie hat er."
    ],
    "explain": "je + comparative, verb last; desto + comparative fills position 1, then the verb, then the subject."
   },
@@ -1982,7 +1972,9 @@ GT.addSet(
    ],
    "answers": [
     "Entweder kommst du mit, oder du bleibst hier.",
-    "Entweder du kommst mit, oder du bleibst hier."
+    "Entweder du kommst mit, oder du bleibst hier.",
+    "Entweder bleibst du hier, oder du kommst mit.",
+    "Entweder du bleibst hier, oder du kommst mit."
    ],
    "explain": "entweder can take position 1 (verb next) or position 0 (subject next). oder is always position 0."
   },
@@ -2054,9 +2046,10 @@ GT.addSet(
     "Erfahrung"
    ],
    "answers": [
-    "Er ist zwar noch jung, aber er hat schon viel Erfahrung."
+    "Er ist zwar noch jung, aber er hat schon viel Erfahrung.",
+    "Er ist zwar noch jung, aber viel Erfahrung hat er schon."
    ],
-   "explain": "zwar …, aber …: aber is position 0, so subject and verb follow normally."
+   "explain": "zwar …, aber …: aber is position 0, so one element follows (normally the subject), then the verb."
   },
   {
    "id": "tW-090",
@@ -2081,7 +2074,8 @@ GT.addSet(
     "gut"
    ],
    "answers": [
-    "Zwar ist das Auto alt, aber es fährt noch gut."
+    "Zwar ist das Auto alt, aber es fährt noch gut.",
+    "Zwar fährt das Auto noch gut, aber es ist alt."
    ],
    "explain": "zwar in position 1 pushes the subject behind the verb; after aber the order is normal."
   },
@@ -2159,7 +2153,8 @@ GT.addSet(
     "gestohlen"
    ],
    "answers": [
-    "Nicht nur hat er gelogen, sondern er hat auch Geld gestohlen."
+    "Nicht nur hat er gelogen, sondern er hat auch Geld gestohlen.",
+    "Nicht nur hat er Geld gestohlen, sondern er hat auch gelogen."
    ],
    "explain": "nicht nur at the start takes position 1 (verb next); sondern is position 0, and auch stands in the middle field."
   },
@@ -2244,10 +2239,8 @@ GT.addSet(
    "kind": "VL",
    "batch": 2,
    "prompt": "Bilden Sie einen Satz.",
-   "start": "Wer",
+   "start": "Wer das nicht",
    "words": [
-    "das",
-    "nicht",
     "glaubt",
     "soll",
     "es",
@@ -2531,11 +2524,8 @@ GT.addSet(
    "kind": "V2",
    "batch": 2,
    "prompt": "Bilden Sie einen Satz.",
-   "start": "Anstatt",
+   "start": "Anstatt sich zu beschweren,",
    "words": [
-    "sich",
-    "zu",
-    "beschweren",
     "sollte",
     "er",
     "selbst",
@@ -2592,7 +2582,7 @@ GT.addSet(
     "Sie hat sich sehr über das Geschenk gefreut.",
     "Sie hat sich über das Geschenk sehr gefreut."
    ],
-   "explain": "The prepositional object usually stands late, just before the participle."
+   "explain": "The prepositional object usually stands late, just before the participle; sehr can stand before or after it."
   },
   {
    "id": "tW-112",
@@ -2933,7 +2923,7 @@ GT.addSet(
    "unit": 6,
    "batch": 2,
    "title": "Meine Großmutter",
-   "text": "Meine Großmutter, die in einem kleinen Dorf aufgewachsen ist, war eine Frau, vor der alle Respekt hatten. Das Haus, in dem sie wohnte, hatte ihr Vater gebaut, dessen Werkstatt gleich nebenan lag. Alles, was sie kochte, kam aus dem Garten, den sie selbst pflegte. Die Geschichten, die sie uns abends erzählte, habe ich nie vergessen. Wer sie einmal besucht hatte, der kam immer gern wieder, was mich nicht wundert.",
+   "text": "Meine Großmutter, die in einem kleinen Dorf aufgewachsen war, war eine Frau, vor der alle Respekt hatten. Das Haus, in dem sie wohnte, hatte ihr Vater gebaut, dessen Werkstatt gleich nebenan lag. Alles, was sie kochte, kam aus dem Garten, den sie selbst pflegte. Die Geschichten, die sie uns abends erzählte, habe ich nie vergessen. Wer sie einmal besucht hatte, der kam immer gern wieder, was mich nicht wundert.",
    "keys": [
     "Großmutter",
     "Dorf",
@@ -2945,7 +2935,7 @@ GT.addSet(
     "wundert"
    ],
    "points": [
-    "Relative pronoun in the right gender and case: die … aufgewachsen ist, den sie selbst pflegte, die sie uns … erzählte",
+    "Relative pronoun in the right gender and case: die … aufgewachsen war, den sie selbst pflegte, die sie uns … erzählte",
     "Preposition + pronoun: vor der alle Respekt hatten; in dem sie wohnte",
     "dessen without an article: dessen Werkstatt",
     "was after alles and for the whole clause: Alles, was sie kochte; …, was mich nicht wundert",
