@@ -26,7 +26,7 @@ const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", 
 function fresh() {
   return {
     v: 1, created: new Date().toISOString(),
-    settings: { track: "J", unit: "1", unitWeek: 1, startDate: "2026-11-16", examDate: "", cardCap: 70 },
+    settings: { track: "J", unit: "1", unitWeek: 1, startDate: "2026-11-16", examDate: "", cardCap: 70, strict: false },
     settingsT: 0,      // when the settings last changed (the newer side wins in sync)
     placement: null,
     attempts: [],      // { id, u, n, t, r: R|W|U, m: mode, a?: answer }
@@ -302,15 +302,20 @@ function exportCards(all) {
 
 // ---------- Answer checking ----------
 
-function norm(s) {
+// tidy: spacing, quotation marks and the final full stop don't matter. norm: nor do ä/ae, ö/oe, ü/ue, ß/ss.
+function tidy(s) {
   return String(s ?? "").normalize("NFC")
     .replace(/[’‘‚`´]/g, "'").replace(/[„“”«»]/g, '"').replace(/[–—]/g, "-")
     .replace(/\s+/g, " ").trim()
-    .replace(/\s+([,.;:!?])/g, "$1").replace(/[.!?]+$/, "")
+    .replace(/\s+([,.;:!?])/g, "$1").replace(/[.!?]+$/, "");
+}
+const unpunct = s => s.replace(/[,;:"'()!?.-]/g, " ").replace(/\s+/g, " ").trim();
+function norm(s) {
+  return tidy(s)
     .replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue")
     .replace(/Ä/g, "Ae").replace(/Ö/g, "Oe").replace(/Ü/g, "Ue").replace(/ß/g, "ss");
 }
-const loose = s => norm(s).toLowerCase().replace(/[,;:"'()!?.-]/g, " ").replace(/\s+/g, " ").trim();
+const loose = s => unpunct(norm(s).toLowerCase());
 
 function acceptedAnswers(it) { return it.answers.concat(S.extra[it.id] || []); }
 
@@ -319,9 +324,17 @@ function judge(it, given) {
   if (!given) return { r: "W", note: "No answer." };
   const acc = acceptedAnswers(it);
   if (it.type === "E" && loose(given) === loose(it.prompt)) return { r: "W", note: "You left the sentence unchanged, but it contains one error." };
-  if (acc.some(a => norm(a) === norm(given))) return { r: "R" };
+  const typed = it.type !== "O" && it.type !== "M";
+  // Strict spelling (Setup): in typed answers capital letters and ä, ö, ü, ß must be right; commas stay lenient.
+  const strict = typed && S.settings.strict;
+  if (acc.some(a => norm(a) === norm(given))) {
+    if (strict && !acc.some(a => tidy(a) === tidy(given))) return { r: "W", note: "Strict spelling is on: write ä, ö, ü and ß, not ae, oe, ue or ss." };
+    return { r: "R" };
+  }
   if (acc.some(a => loose(a) === loose(given))) {
-    return it.type === "O" || it.type === "M" ? { r: "R" } : { r: "R", note: "Accepted, but compare capitalisation and punctuation with the solution." };
+    if (!typed) return { r: "R" };
+    if (strict && !acc.some(a => unpunct(tidy(a)) === unpunct(tidy(given)))) return { r: "W", note: "Strict spelling is on: the words are right, but check the capital letters and ä, ö, ü, ß." };
+    return { r: "R", note: strict ? "Accepted, but compare the punctuation with the solution." : "Accepted, but compare capitalisation and punctuation with the solution." };
   }
   if (OPEN_TYPES.includes(it.type)) return { r: "U", note: "Your answer isn't on the list of accepted answers. It may still be right: compare it with the solution." };
   return { r: "W" };
@@ -554,7 +567,7 @@ function renderDrills() {
         <button data-m="E">Find the errors</button>
         <button data-m="timed">Timed (Z)</button>
       </div>` : `<p>No exercise sets are installed.</p>`}
-      <p class="note">Units with sets: ${units.map(unitName).join(", ") || "none"}. Answers are checked ignoring ß/ss, ä/ae and spacing. For transformations, an answer that isn't on the list is marked <i>unsure</i>, not wrong.</p>
+      <p class="note">Units with sets: ${units.map(unitName).join(", ") || "none"}. ${S.settings.strict ? "Strict spelling is on: capital letters and ä, ö, ü, ß count in typed answers." : "Answers are checked ignoring capital letters, ß/ss, ä/ae and spacing (change this in Setup)."} For transformations, an answer that isn't on the list is marked <i>unsure</i>, not wrong.</p>
     </div>
 
     <div class="card">
@@ -1547,6 +1560,13 @@ function renderSetup() {
     </div>
 
     <div class="card">
+      <h2>Answer checking</h2>
+      <p><label style="display:flex;gap:8px;align-items:flex-start;font-weight:400"><input type="checkbox" id="strictBox" ${S.settings.strict ? "checked" : ""} style="margin-top:4px">
+        <span><b>Strict spelling.</b> In typed answers a wrong capital letter counts as wrong, and so do ae, oe, ue or ss in place of ä, ö, ü, ß. Commas and the final full stop stay lenient.</span></label></p>
+      <p class="note">Off: such answers are accepted with a note. Spelling counts in the writing module of the exam, so switch this on once the grammar itself feels safe.</p>
+    </div>
+
+    <div class="card">
       <h2>Anki</h2>
       <p>${newCards()} new of ${S.cards.length} cards. ${esc(heldNote())}</p>
       <label for="cardCap">Most new cards in seven days</label>
@@ -1600,6 +1620,7 @@ function renderSetup() {
   $("#trk").onchange = e => setTrack(e.target.value);
   $("#cur").onchange = e => { S.settings.unit = e.target.value; S.settings.unitWeek = 1; save(); renderSetup(); };
   $("#wk").onchange = e => { S.settings.unitWeek = Math.min(Number(e.target.value), seqPos().entry.weeks); save(); renderSetup(); };
+  $("#strictBox").onchange = e => { S.settings.strict = e.target.checked; save(); toast(e.target.checked ? "Strict spelling is on." : "Strict spelling is off."); };
   $("#ankiNew").onclick = () => exportCards(false);
   $("#cardCap").onchange = e => { S.settings.cardCap = Math.min(500, Math.max(0, Math.round(Number(e.target.value) || 0))); save(); render(); };
   $("#ankiAll").onclick = () => exportCards(true);
