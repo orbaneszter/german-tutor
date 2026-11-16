@@ -13,7 +13,7 @@ TYPES = {"L", "T", "E", "O", "S", "M"}
 LEVELS = {"B1", "B2", "C1", "C2"}
 REQUIRED = ["id", "unit", "node", "type", "level", "prompt", "answers", "explain"]
 THREAD_CATS = {"G": {"G1", "G2", "G3"}, "W": {"W"}}
-W_KINDS = {"V2", "VL", "BR", "PR", "NG"}   # verb second, verb last, bracket, pronouns and middle field, nicht
+W_KINDS = {"V2", "VL", "BR", "PR", "NG", "KO"}   # verb second, verb last, bracket, pronouns and middle field, nicht, connectors
 
 
 def read_curriculum():

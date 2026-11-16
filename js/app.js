@@ -12,7 +12,7 @@ const OPEN_TYPES = ["T", "S", "E"];          // more than one answer can be righ
 const TIME_LIMIT = { L: 25, M: 20, O: 40, T: 60, S: 60, E: 45 };  // seconds per item in timed mode
 const SPRINT_LIMIT = { L: 15, M: 8 };       // seconds per item in the endings sprint
 const BUILD_LIMIT = { O: 30 };               // seconds per sentence in sentence building (thread W)
-const W_KINDS = { V2: "Verb second", VL: "Verb last and verb clusters", BR: "Sentence bracket", PR: "Pronouns and middle field", NG: "Position of nicht" };
+const W_KINDS = { V2: "Verb second", VL: "Verb last and verb clusters", BR: "Sentence bracket", PR: "Pronouns and middle field", NG: "Position of nicht", KO: "Connectors" };
 const SPRINT_GOAL = { pct: 90, sec: 8 };    // plan v3: 90% right at under 8 seconds an item
 const CAT_NAMES = { G1: "Gender (der, die, das)", G2: "Choosing the case", G3: "Ending pattern" };
 // Error categories for writing and speaking feedback (plan v3, section 7).
@@ -802,7 +802,8 @@ function doCheck(dunno, timeout) {
   if (session.mode === "sprint") {
     att.d = Date.now() - session.shown; saveSoon();
     const at = session.i;   // a right answer moves on by itself, so the sprint keeps its pace
-    if (j.r === "R") setTimeout(() => { if (session && session.mode === "sprint" && session.i === at && !session.done) nextItem(); }, 700);
+    // with a note (accepted, but check the capital letter) it waits long enough to read it; the time is already recorded
+    if (j.r === "R") setTimeout(() => { if (session && session.mode === "sprint" && session.i === at && !session.done) nextItem(); }, j.note ? 2500 : 700);
   }
 }
 
